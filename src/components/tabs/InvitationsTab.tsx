@@ -223,3 +223,4 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
     </div>
   );
 };
+

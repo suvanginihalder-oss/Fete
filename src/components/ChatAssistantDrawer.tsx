@@ -336,3 +336,4 @@ export const ChatAssistantDrawer: React.FC<ChatAssistantDrawerProps> = ({
     </div>
   );
 };
+

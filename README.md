@@ -226,3 +226,4 @@ vercel
   - Switch to **"Invites & Sharing"**, toggle tone from Formal to Funky, and copy the **Compressed Read-Only URL**.
 - **3:20 - 3:30 (Closing)**:
   - Open the generated link in a new private window to prove zero-setup read-only rendering. Conclude on reliability, safety, and speed.
+

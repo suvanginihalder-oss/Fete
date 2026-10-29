@@ -37,3 +37,4 @@ export const Toast: React.FC<ToastProps> = ({ message, type = 'success', onDismi
     </div>
   );
 };
+

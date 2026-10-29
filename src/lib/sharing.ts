@@ -112,3 +112,4 @@ export function generateWhatsAppLink(text: string): string {
 export function triggerPrint() {
   window.print();
 }
+

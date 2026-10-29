@@ -109,3 +109,4 @@ export const vendorSectionSchema = z.object({
   expertTips: z.array(z.string()).min(2),
   weatherPlanB: weatherPlanBSchema,
 });
+

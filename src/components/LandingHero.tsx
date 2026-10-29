@@ -147,3 +147,4 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
     </div>
   );
 };
+

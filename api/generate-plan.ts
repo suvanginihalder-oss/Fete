@@ -100,3 +100,4 @@ Special: ${parsedInput.data.specialRequests}`;
     return res.status(500).json({ success: false, error: err.message || 'Internal server error' });
   }
 }
+

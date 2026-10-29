@@ -190,3 +190,4 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
     </div>
   );
 };
+

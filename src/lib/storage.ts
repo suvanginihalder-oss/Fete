@@ -118,3 +118,4 @@ export function checkRateQuota(): { allowed: boolean; remaining: number } {
     return { allowed: true, remaining: DAILY_LIMIT };
   }
 }
+

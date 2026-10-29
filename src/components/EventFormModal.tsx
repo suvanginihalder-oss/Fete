@@ -419,3 +419,4 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
     </div>
   );
 };
+
