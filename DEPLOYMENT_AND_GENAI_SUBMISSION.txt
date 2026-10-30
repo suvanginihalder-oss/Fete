@@ -1,123 +1,76 @@
 ================================================================================
-PART 1: CHANGES / UPDATES MADE IN THE DEPLOYED VERSION
+QUESTION 1: DESCRIBE THE CHANGES/UPDATES MADE IN THE DEPLOYED VERSION
 ================================================================================
 
-1. Parallel Sectioned GenAI Architecture (Solving Serverless Timeouts):
-   - Replaced traditional monolithic "one-shot" plan generation with 4 concurrent, 
-     parallel API calls (Concept, Budget, Timeline & Schedule, Vendors & Plan B).
-   - Prevents Vercel serverless function timeouts (10s hobby limit) and reduces 
-     total generation latency by ~70%.
-   - Implemented progressive skeleton loading so each section renders independently 
-     as soon as its stream arrives, accompanied by automatic single-retry error guards.
+The deployed version of CelebrAI introduces key full-stack and architectural advancements that transform traditional event planning into an intelligent, resilient, and demo-safe production application:
 
-2. Code-Owned Financial & Temporal Mathematics (Zero Hallucination Guarantee):
-   - Eliminated LLM calculation errors: code (not the AI) strictly governs all 
-     financial math via deterministic TypeScript functions (src/lib/math.ts).
-   - Budget lines are dynamically rescaled to match the target total down to the exact 
-     penny/rupee, eliminating rounding loss.
-   - Built a real-time "What-If" Budget Simulation Slider that rescales allocations 
-     and recalculates per-head costs entirely client-side without costly AI calls.
-   - Converts offset days into real calendar dates; automatically detects tight 
-     event timelines and compresses milestone intervals while flagging overdue tasks.
-   - Fully covered with 8 automated unit tests running on Vitest.
+1. Parallel Sectioned GenAI Generation:
+   To overcome the 10-second timeout limitation of serverless environments (Vercel), monolithic plan generation was replaced with 4 concurrent, asynchronous streams:
+   - Section A: Creative Concept & Theming
+   - Section B: Itemized Budget & Cost-Saving Options
+   - Section C: Preparation Timeline & Minute-by-Minute Run Sheet
+   - Section D: Vendor Negotiation Checklist & Weather Contingency Plan B
+   This parallel execution reduces total wait time by ~70%. Each section validates against strict Zod schemas and renders progressively with skeleton loaders, supported by automated single-retry error recovery.
 
-3. Context-Aware AI Chat Assistant with 1-Click Structured Diffs:
-   - Built an interactive chat assistant with full context of the active event plan 
-     (budget, timeline, guests, city, dietary constraints).
-   - Returns structured diff cards (e.g., reallocating catering savings to the emergency 
-     buffer or inserting a weather contingency task) that users can review and apply 
-     with a single click, instantly re-running all financial and date formulas.
+2. Code-Owned Financial & Temporal Mathematics (Zero Hallucination):
+   Language models frequently make rounding and arithmetic errors. CelebrAI completely decouples math from the LLM:
+   - Integer Rescaling: Budget allocations are mathematically rescaled down to the exact rupee/cent, eliminating penny discrepancies.
+   - Interactive What-If Slider: Users can adjust total budget or guest headcount in real time; all allocations, per-head costs, and warnings re-calculate instantly in code without triggering any API calls.
+   - Intelligent Date Calculation: Converts preparation offset days into real calendar dates. If an event date is close, the engine automatically compresses milestone intervals and highlights unavoidable overdue milestones.
+   - Verified by 8 automated Vitest unit tests covering budget distribution, date parsing, and RSVP metrics.
 
-4. Guest Roster & RSVP Costing Engine:
-   - Added interactive guest tracking (status: confirmed, pending, declined) with 
-     plus-one headcount computations.
-   - Computes dynamic per-head costs (Total Budget / Effective Headcount) and produces 
-     an aggregated dietary restriction tally (Pure Veg, Jain, Halal, etc.) for catering teams.
+3. Context-Aware AI Chat Assistant with 1-Click Actionable Diffs:
+   Built a conversational assistant that retains full blueprint context (budget, dates, guests, dietary constraints). Instead of generic advice, it outputs structured diff proposals (e.g., shifting ₹8,000 from floral decor into an emergency buffer). Users apply changes with a single click, automatically executing code math recalculations.
 
-5. Multi-Tone Invitation Suite & Zero-Backend Sharing:
-   - Added an AI Invitation Generator producing customized invitation copy in 4 distinct 
-     tones (Formal, Casual, Poetic, Funky) with 1-click WhatsApp dispatch links.
-   - Implemented zero-backend URL sharing using lz-string URI compression. Encodes the entire 
-     event blueprint into the browser URL, allowing instant read-only sharing without 
-     requiring user logins or external database servers.
-   - Added JSON backup export/import and dedicated print/PDF stylesheets (@media print).
+4. Guest Management & Dynamic RSVP Costing:
+   Integrated a full guest tracker managing invitation statuses (confirmed, pending, declined) and plus-ones. It computes dynamic per-head spend (Total Budget / Attending Headcount) and compiles aggregated dietary summaries (Pure Veg, Jain, Gluten-Free) for catering vendors.
+
+5. Multi-Tone Invitations & Zero-Backend URL Sharing:
+   - AI Invitation Studio crafts customized invites across 4 distinct tones (Formal, Casual, Poetic, Funky) with direct 1-click WhatsApp messaging links.
+   - Zero-Backend URL Sharing: Encodes the full event state into a compressed URL hash via lz-string, allowing instant, authenticated-free, read-only link sharing without a database or server dependency.
+   - Includes JSON backup export/import and dedicated print/PDF styling (@media print).
 
 6. Demo Safety Guard & Rate Limiting:
-   - Implemented per-IP rate limiting and daily request quotas.
-   - If API limits, rate caps, or network outages occur, CelebrAI automatically falls back 
-     to a high-fidelity local demo generator with an honest banner: "Sample plan, not live AI", 
-     ensuring the demo never crashes during evaluation or live judging.
-   - Pre-seeded with a 1-click sample: "Aura '26: Inter-College Cultural & Arts Fest" 
-     (250 guests, ₹50,000, 1 month away).
+   Enforced per-IP rate limiting and automated fallback to an offline high-fidelity sample engine when quotas or outages hit. A transparent banner notifies users: "Sample plan, not live AI (Demo Safety Active)", ensuring evaluations and live demos never crash.
 
 
 ================================================================================
-PART 2: GEN AI SERVICES UTILIZED IN THE SUBMISSION & WHERE THEY ARE UTILIZED
+QUESTION 2: MENTION THE GEN AI SERVICES UTILIZED IN THE SUBMISSION, AND WHERE DID YOU UTILIZE IT?
 ================================================================================
 
-1. Primary GenAI Service:
-   - Google Gemini API (Model: gemini-1.5-flash via Google AI Studio Developer API)
-   - Reason: Ultra-low latency, generous free tier rate limits, and native structured 
-     JSON mode output.
+1. Primary GenAI Service & Foundation Model:
+   - Service: Google Gemini API (Model: gemini-1.5-flash via Google AI Studio Developer API).
+   - Selection Rationale: Offers low latency, native structured JSON output formatting, and generous free-tier rate limits ideal for high-throughput parallel section calls.
 
-2. Provider Adapter Architecture (Multi-Model Support):
-   - Implemented in a unified adapter file (src/lib/ai/providerAdapter.ts).
-   - Allows seamless runtime switching between:
-     * Google Gemini API (gemini-1.5-flash) [Default / Free Tier]
-     * Anthropic Claude API (claude-3-haiku-20240307)
-     * OpenAI API (gpt-4o-mini)
-     Controlled via the LLM_PROVIDER environment variable.
+2. Provider Adapter Architecture (Multi-Model Portability):
+   Implemented in a modular adapter pattern (src/lib/ai/providerAdapter.ts) allowing instant switching between:
+   - Google Gemini API (gemini-1.5-flash) [Default]
+   - Anthropic Claude API (claude-3-haiku-20240307)
+   - OpenAI API (gpt-4o-mini)
+   Switchable in production via the LLM_PROVIDER environment variable.
 
 3. Specific Locations Where GenAI is Utilized:
 
-   A. Section A: Creative Concept & Theming Engine
-      - Endpoint: POST /api/generate-plan (section: "concept")
-      - Location in Code: src/lib/ai/parallelPlanner.ts, api/generate-plan.ts
-      - What it does: Ingests event type, city, theme, cultural background, dietary 
-        requirements, and special constraints to generate:
-        * Creative thematic tagline
-        * Mood, decor styling, and percentage budget shares
-        * Signature culinary menu highlights tailored to dietary needs
-        * Staged entertainment lineups (acoustic -> mainstage -> DJ/finale)
-        * Interactive crowd engagement and memory activities.
+   A. Creative Concept & Theming Engine
+      - Endpoint & Files: POST /api/generate-plan (section: "concept") | src/lib/ai/parallelPlanner.ts
+      - Application: Synthesizes event type, venue city, guest count, cultural traditions, and dietary requirements to generate bespoke taglines, theme styling, budget percentage shares, signature multi-course culinary highlights, staged entertainment schedules, and crowd engagement activities.
 
-   B. Section B: Intelligent Budget Allocation & Savings Engine
-      - Endpoint: POST /api/generate-plan (section: "budget")
-      - Location in Code: src/lib/ai/parallelPlanner.ts, api/generate-plan.ts
-      - What it does: Analyzes event requirements to recommend tailored category 
-        allocation weights (Venue, Catering, Decor, Production, Buffer). Crucially, 
-        it identifies high-impact "Cheaper Alternatives" with estimated savings amounts 
-        (e.g., student guild fabrication, seasonal blooms) that users can adopt with 1 click.
+   B. Budget Allocation & Cost-Optimization Engine
+      - Endpoint & Files: POST /api/generate-plan (section: "budget") | src/lib/ai/parallelPlanner.ts
+      - Application: Evaluates local city pricing and event category norms to establish baseline expenditure weights. It identifies pragmatic "Cheaper Alternatives" with estimated monetary savings (e.g., sourcing alumni artists, utilizing in-house venue sound rigs) that can be applied with one click.
 
-   C. Section C: Milestones Timeline & Minute-by-Minute Run Sheet Engine
-      - Endpoint: POST /api/generate-plan (section: "timeline")
-      - Location in Code: src/lib/ai/parallelPlanner.ts, api/generate-plan.ts
-      - What it does: Generates logical event preparation milestones with priority 
-        and dueOffsetDays relative to the event date. Additionally generates a complete 
-        minute-by-minute event-day schedule specifying time slots, activities, team 
-        owners (e.g. Stage Lead, Hospitality Desk), and operational cues.
+   C. Milestone Timeline & Minute-by-Minute Run Sheet Engine
+      - Endpoint & Files: POST /api/generate-plan (section: "timeline") | src/lib/ai/parallelPlanner.ts
+      - Application: Calculates chronological preparation intervals (dueOffsetDays) categorized by priority. Also produces an event-day minute-by-minute operational run sheet with specific time windows, activity milestones, and lead team assignments (e.g., Stage Lead, Hospitality Captain).
 
-   D. Section D: Vendor Intelligence, Checklist & Risk Management Engine
-      - Endpoint: POST /api/generate-plan (section: "vendors")
-      - Location in Code: src/lib/ai/parallelPlanner.ts, api/generate-plan.ts
-      - What it does: Generates objective vendor categories with estimated market cost 
-        ranges, critical vendor negotiation questions, coordinator field tips, and an 
-        unpredictable weather Plan B (contingency steps, standby gear, indoor transitions).
+   D. Vendor Intelligence & Risk Contingency Engine
+      - Endpoint & Files: POST /api/generate-plan (section: "vendors") | src/lib/ai/parallelPlanner.ts
+      - Application: Produces realistic vendor categories with objective market price ranges, hard-hitting negotiation questions to prevent hidden fees, expert coordinator field advice, and a comprehensive Weather Plan B (risk assessment, contingency steps, standby equipment).
 
-   E. Context-Aware Event Planning Chat Assistant
-      - Endpoint: POST /api/chat
-      - Location in Code: api/chat.ts, src/components/ChatAssistantDrawer.tsx
-      - What it does: Ingests the full live blueprint context (name, city, guests, budget, 
-        current allocations, timeline). Responds to host inquiries and returns structured 
-        executable diff proposals (e.g., "Reduce food & decor by ₹8,000 to boost emergency buffer") 
-        which the user can apply directly to mutate the live state.
+   E. Context-Aware Assistant with Structured Diffs
+      - Endpoint & Files: POST /api/chat | api/chat.ts, src/components/ChatAssistantDrawer.tsx
+      - Application: Takes the full live event state as prompt context. When asked to optimize expenses or adjust logistics, it generates structured payload diffs that modify lines and timeline milestones directly in the user's active session.
 
    F. Contextual Multi-Tone Invitation Generator
-      - Location in Code: src/lib/sharing.ts, src/components/tabs/InvitationsTab.tsx
-      - What it does: Synthesizes the event's theme, date, city, and host preferences to 
-        craft customized invitation text across 4 distinct communication styles:
-        * Formal (ceremonial & polite)
-        * Casual (approachable & friendly)
-        * Poetic (nostalgic & evocative)
-        * Funky (high-energy & celebratory)
-        Formatted with direct 1-click WhatsApp messaging URL links.
+      - Files: src/lib/sharing.ts | src/components/tabs/InvitationsTab.tsx
+      - Application: Transforms event theme, venue, date, and host constraints into tailored invitation copy across Formal, Casual, Poetic, and Funky tones with direct WhatsApp dispatch integration.
