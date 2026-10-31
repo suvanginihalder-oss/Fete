@@ -1,8 +1,8 @@
-import { EventPlan } from '../types';
+import { EventPlan } from "../types";
 
-const STORAGE_KEY = 'celebr_ai_saved_events';
-const ACTIVE_EVENT_KEY = 'celebr_ai_active_id';
-const RATE_LIMIT_KEY = 'celebr_ai_rate_quota';
+const STORAGE_KEY = "celebr_ai_saved_events";
+const ACTIVE_EVENT_KEY = "celebr_ai_active_id";
+const RATE_LIMIT_KEY = "celebr_ai_rate_quota";
 
 const DAILY_LIMIT = 200;
 
@@ -12,7 +12,7 @@ export function getSavedPlans(): EventPlan[] {
     if (!raw) return [];
     return JSON.parse(raw);
   } catch (e) {
-    console.error('Failed to read saved events from localStorage:', e);
+    console.error("Failed to read saved events from localStorage:", e);
     return [];
   }
 }
@@ -20,7 +20,7 @@ export function getSavedPlans(): EventPlan[] {
 export function savePlanToStorage(plan: EventPlan): void {
   try {
     const existing = getSavedPlans();
-    const index = existing.findIndex(p => p.id === plan.id);
+    const index = existing.findIndex((p) => p.id === plan.id);
     let updated: EventPlan[];
 
     if (index >= 0) {
@@ -33,13 +33,13 @@ export function savePlanToStorage(plan: EventPlan): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     localStorage.setItem(ACTIVE_EVENT_KEY, plan.id);
   } catch (e) {
-    console.error('Failed to save plan to localStorage:', e);
+    console.error("Failed to save plan to localStorage:", e);
   }
 }
 
 export function getPlanById(id: string): EventPlan | null {
   const plans = getSavedPlans();
-  return plans.find(p => p.id === id) || null;
+  return plans.find((p) => p.id === id) || null;
 }
 
 export function getActivePlanId(): string | null {
@@ -53,13 +53,13 @@ export function setActivePlanId(id: string): void {
 export function deletePlanFromStorage(id: string): void {
   try {
     const existing = getSavedPlans();
-    const updated = existing.filter(p => p.id !== id);
+    const updated = existing.filter((p) => p.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     if (getActivePlanId() === id) {
       localStorage.removeItem(ACTIVE_EVENT_KEY);
     }
   } catch (e) {
-    console.error('Failed to delete plan:', e);
+    console.error("Failed to delete plan:", e);
   }
 }
 
@@ -68,18 +68,30 @@ export function exportPlansToJSON(): string {
   return JSON.stringify(plans, null, 2);
 }
 
-export function importPlansFromJSON(jsonText: string): { success: boolean; count: number; error?: string } {
+export function importPlansFromJSON(jsonText: string): {
+  success: boolean;
+  count: number;
+  error?: string;
+} {
   try {
     const parsed = JSON.parse(jsonText);
     const plansArray = Array.isArray(parsed) ? parsed : [parsed];
 
-    if (plansArray.length === 0 || !plansArray[0].id || !plansArray[0].concept) {
-      return { success: false, count: 0, error: 'Invalid CelebrAI event backup file format' };
+    if (
+      plansArray.length === 0 ||
+      !plansArray[0].id ||
+      !plansArray[0].concept
+    ) {
+      return {
+        success: false,
+        count: 0,
+        error: "Invalid CelebrAI event backup file format",
+      };
     }
 
     const current = getSavedPlans();
     const map = new Map<string, EventPlan>();
-    current.forEach(p => map.set(p.id, p));
+    current.forEach((p) => map.set(p.id, p));
     plansArray.forEach((p: EventPlan) => map.set(p.id, p));
 
     const combined = Array.from(map.values());
@@ -90,7 +102,11 @@ export function importPlansFromJSON(jsonText: string): { success: boolean; count
 
     return { success: true, count: plansArray.length };
   } catch (err: any) {
-    return { success: false, count: 0, error: err.message || 'Corrupted JSON file' };
+    return {
+      success: false,
+      count: 0,
+      error: err.message || "Corrupted JSON file",
+    };
   }
 }
 
@@ -99,7 +115,7 @@ export function importPlansFromJSON(jsonText: string): { success: boolean; count
  */
 export function checkRateQuota(): { allowed: boolean; remaining: number } {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const raw = localStorage.getItem(RATE_LIMIT_KEY);
     let record = raw ? JSON.parse(raw) : { date: today, count: 0 };
 
@@ -118,4 +134,3 @@ export function checkRateQuota(): { allowed: boolean; remaining: number } {
     return { allowed: true, remaining: DAILY_LIMIT };
   }
 }
-

@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
-import { Users, UserPlus, CheckCircle, Clock, XCircle, Trash2, Shield, DollarSign } from 'lucide-react';
-import { GuestItem } from '../../types';
-import { calculateGuestMetrics } from '../../lib/math';
+import React, { useState } from "react";
+import {
+  Users,
+  UserPlus,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Trash2,
+  Shield,
+  DollarSign,
+} from "lucide-react";
+import { GuestItem } from "../../types";
+import { calculateGuestMetrics } from "../../lib/math";
 
 interface GuestTrackerTabProps {
   guests: GuestItem[];
@@ -21,10 +30,12 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
   isReadOnly,
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
-  const [status, setStatus] = useState<'confirmed' | 'pending' | 'declined'>('confirmed');
-  const [dietaryNote, setDietaryNote] = useState('');
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [status, setStatus] = useState<"confirmed" | "pending" | "declined">(
+    "confirmed",
+  );
+  const [dietaryNote, setDietaryNote] = useState("");
   const [plusOnes, setPlusOnes] = useState(0);
 
   const metrics = calculateGuestMetrics(guests, totalBudget, expectedGuests);
@@ -43,16 +54,21 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
     };
 
     onUpdateGuests([...guests, newGuest]);
-    setName('');
-    setContact('');
-    setDietaryNote('');
+    setName("");
+    setContact("");
+    setDietaryNote("");
     setPlusOnes(0);
     setShowAddModal(false);
   };
 
-  const handleStatusChange = (id: string, newStatus: 'confirmed' | 'pending' | 'declined') => {
+  const handleStatusChange = (
+    id: string,
+    newStatus: "confirmed" | "pending" | "declined",
+  ) => {
     if (isReadOnly) return;
-    const updated = guests.map((g) => (g.id === id ? { ...g, status: newStatus } : g));
+    const updated = guests.map((g) =>
+      g.id === id ? { ...g, status: newStatus } : g,
+    );
     onUpdateGuests(updated);
   };
 
@@ -69,31 +85,41 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
         {/* Confirmed Attending */}
         <div className="p-5 rounded-3xl bg-white border border-ivory-300 shadow-soft">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">Confirmed</span>
+            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">
+              Confirmed
+            </span>
             <CheckCircle className="w-4 h-4 text-emerald-600" />
           </div>
           <p className="text-2xl sm:text-3xl font-bold font-mono text-emerald-800">
             {metrics.confirmed}
           </p>
-          <span className="text-[11px] text-stone-700">headcount attending</span>
+          <span className="text-[11px] text-stone-700">
+            headcount attending
+          </span>
         </div>
 
         {/* Pending Awaiting RSVP */}
         <div className="p-5 rounded-3xl bg-white border border-ivory-300 shadow-soft">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">Pending</span>
+            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">
+              Pending
+            </span>
             <Clock className="w-4 h-4 text-amber-600" />
           </div>
           <p className="text-2xl sm:text-3xl font-bold font-mono text-amber-800">
             {metrics.pending}
           </p>
-          <span className="text-[11px] text-stone-700">awaiting RSVP response</span>
+          <span className="text-[11px] text-stone-700">
+            awaiting RSVP response
+          </span>
         </div>
 
         {/* Declined */}
         <div className="p-5 rounded-3xl bg-white border border-ivory-300 shadow-soft">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">Declined</span>
+            <span className="text-xs text-stone-700 font-semibold uppercase tracking-wider">
+              Declined
+            </span>
             <XCircle className="w-4 h-4 text-stone-600" />
           </div>
           <p className="text-2xl sm:text-3xl font-bold font-mono text-stone-700">
@@ -105,13 +131,17 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
         {/* Per-Head Cost Math */}
         <div className="p-5 rounded-3xl bg-gradient-to-br from-plum-900 to-plum-950 text-white shadow-soft">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-coral-200 font-semibold uppercase tracking-wider">Per-Head Cost</span>
+            <span className="text-xs text-coral-200 font-semibold uppercase tracking-wider">
+              Per-Head Cost
+            </span>
             <DollarSign className="w-4 h-4 text-coral-300" />
           </div>
           <p className="text-2xl sm:text-3xl font-bold font-mono text-white">
             {currency} {metrics.perHeadCost.toLocaleString()}
           </p>
-          <span className="text-[11px] text-plum-200">total budget ÷ {metrics.effectiveGuests} guests</span>
+          <span className="text-[11px] text-plum-200">
+            total budget ÷ {metrics.effectiveGuests} guests
+          </span>
         </div>
       </div>
 
@@ -120,7 +150,9 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
         <div className="p-6 rounded-3xl bg-champagne-100/70 border border-champagne-300 shadow-soft">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="w-4 h-4 text-amber-800" />
-            <h4 className="font-serif font-bold text-sm text-plum-950">Dietary Accommodation Counts (For Caterer)</h4>
+            <h4 className="font-serif font-bold text-sm text-plum-950">
+              Dietary Accommodation Counts (For Caterer)
+            </h4>
           </div>
           <div className="flex flex-wrap gap-2.5">
             {Object.entries(metrics.dietaryCounts).map(([diet, count]) => (
@@ -128,7 +160,8 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
                 key={diet}
                 className="px-3 py-1.5 rounded-xl bg-white border border-champagne-300 text-xs text-stone-800 font-medium shadow-2xs"
               >
-                <strong className="text-plum-950 font-bold">{count}x</strong> {diet}
+                <strong className="text-plum-950 font-bold">{count}x</strong>{" "}
+                {diet}
               </span>
             ))}
           </div>
@@ -139,8 +172,12 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
       <div className="bg-white rounded-3xl border border-ivory-300 shadow-soft overflow-hidden">
         <div className="p-6 border-b border-ivory-300 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h3 className="font-serif font-bold text-lg text-plum-950">Guest Roster & Status</h3>
-            <p className="text-xs text-stone-700">Track RSVPs, plus-ones, and dietary restrictions</p>
+            <h3 className="font-serif font-bold text-lg text-plum-950">
+              Guest Roster & Status
+            </h3>
+            <p className="text-xs text-stone-700">
+              Track RSVPs, plus-ones, and dietary restrictions
+            </p>
           </div>
 
           {!isReadOnly && (
@@ -159,7 +196,9 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
         {showAddModal && (
           <div className="p-6 bg-ivory-100 border-b border-ivory-300">
             <form onSubmit={handleAddGuest} className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-plum-950">Add Guest Information</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-plum-950">
+                Add Guest Information
+              </h4>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <input
                   type="text"
@@ -239,11 +278,23 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
             </thead>
             <tbody className="divide-y divide-ivory-200">
               {guests.map((g) => (
-                <tr key={g.id} className="hover:bg-ivory-50/80 transition-colors">
-                  <td className="px-5 py-3.5 font-semibold text-plum-950">{g.name}</td>
-                  <td className="px-4 py-3.5 text-stone-700">{g.emailOrPhone || '—'}</td>
+                <tr
+                  key={g.id}
+                  className="hover:bg-ivory-50/80 transition-colors"
+                >
+                  <td className="px-5 py-3.5 font-semibold text-plum-950">
+                    {g.name}
+                  </td>
+                  <td className="px-4 py-3.5 text-stone-700">
+                    {g.emailOrPhone || "—"}
+                  </td>
                   <td className="px-4 py-3.5 font-mono">
-                    1 {g.plusOnes > 0 && <span className="text-coral-600 font-bold">(+{g.plusOnes})</span>}
+                    1{" "}
+                    {g.plusOnes > 0 && (
+                      <span className="text-coral-600 font-bold">
+                        (+{g.plusOnes})
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3.5">
                     {g.dietaryNote ? (
@@ -251,26 +302,36 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
                         {g.dietaryNote}
                       </span>
                     ) : (
-                      <span className="text-stone-700 text-[11px]">Standard</span>
+                      <span className="text-stone-700 text-[11px]">
+                        Standard
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3.5">
                     {isReadOnly ? (
-                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize ${
-                        g.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' : g.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-700'
-                      }`}>
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize ${
+                          g.status === "confirmed"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : g.status === "pending"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-stone-200 text-stone-700"
+                        }`}
+                      >
                         {g.status}
                       </span>
                     ) : (
                       <select
                         value={g.status}
-                        onChange={(e) => handleStatusChange(g.id, e.target.value as any)}
+                        onChange={(e) =>
+                          handleStatusChange(g.id, e.target.value as any)
+                        }
                         className={`text-xs font-semibold px-2 py-1 rounded-lg border ${
-                          g.status === 'confirmed'
-                            ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                            : g.status === 'pending'
-                            ? 'bg-amber-50 border-amber-300 text-amber-900'
-                            : 'bg-stone-100 border-stone-300 text-stone-700'
+                          g.status === "confirmed"
+                            ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                            : g.status === "pending"
+                              ? "bg-amber-50 border-amber-300 text-amber-900"
+                              : "bg-stone-100 border-stone-300 text-stone-700"
                         }`}
                       >
                         <option value="confirmed">Confirmed</option>
@@ -300,4 +361,3 @@ export const GuestTrackerTab: React.FC<GuestTrackerTabProps> = ({
     </div>
   );
 };
-

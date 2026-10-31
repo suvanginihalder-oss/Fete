@@ -1,20 +1,35 @@
-import React from 'react';
-import { Sparkles, ArrowRight, ShieldCheck, Cpu, Sliders, Users, CalendarCheck, Share2 } from 'lucide-react';
-import { EventType } from '../types';
+import React from "react";
+import {
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Cpu,
+  Sliders,
+  Users,
+  CalendarCheck,
+  Share2,
+} from "lucide-react";
+import { EventType } from "../types";
 
 interface LandingHeroProps {
   onStartNew: (type?: EventType) => void;
   onLoadSample: () => void;
 }
 
-export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSample }) => {
+export const LandingHero: React.FC<LandingHeroProps> = ({
+  onStartNew,
+  onLoadSample,
+}) => {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Hero Header */}
       <div className="text-center max-w-3xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-plum-100/80 border border-plum-200 text-plum-900 text-xs font-semibold mb-6">
           <Sparkles className="w-3.5 h-3.5 text-coral-600" />
-          <span>Zero Serverless Timeouts • 4 Parallel Section Calls • Code-Owned Math</span>
+          <span>
+            Zero Serverless Timeouts • 4 Parallel Section Calls • Code-Owned
+            Math
+          </span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-plum-950 tracking-tight leading-tight mb-6">
@@ -25,9 +40,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
         </h1>
 
         <p className="text-base sm:text-lg text-stone-700 leading-relaxed mb-8">
-          CelebrAI crafts comprehensive event blueprints for weddings, birthdays, anniversaries,
-          college fests, and community gatherings. Fast progressive generation, code-rescaled budgets,
-          over-budget safeguards, interactive what-if sliders, and zero-backend URL sharing.
+          CelebrAI crafts comprehensive event blueprints for weddings,
+          birthdays, anniversaries, college fests, and community gatherings.
+          Fast progressive generation, code-rescaled budgets, over-budget
+          safeguards, interactive what-if sliders, and zero-backend URL sharing.
         </p>
 
         {/* CTAs */}
@@ -54,7 +70,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
         {/* Demo Safety Guarantee badge */}
         <div className="mt-6 flex items-center justify-center gap-2 text-xs text-stone-700">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Demo Safety Guaranteed: Always loads smoothly with zero flaky API dependency</span>
+          <span>
+            Demo Safety Guaranteed: Always loads smoothly with zero flaky API
+            dependency
+          </span>
         </div>
       </div>
 
@@ -64,9 +83,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
           <div className="w-10 h-10 rounded-xl bg-plum-100 flex items-center justify-center text-plum-900 mb-3">
             <Cpu className="w-5 h-5 text-plum-800" />
           </div>
-          <h2 className="font-semibold text-plum-950 mb-1 text-base">4 Parallel Section Calls</h2>
+          <h2 className="font-semibold text-plum-950 mb-1 text-base">
+            4 Parallel Section Calls
+          </h2>
           <p className="text-xs text-stone-700 leading-relaxed">
-            Eliminates serverless timeouts. Concept, budget, timeline, and vendors load concurrently with skeletons.
+            Eliminates serverless timeouts. Concept, budget, timeline, and
+            vendors load concurrently with skeletons.
           </p>
         </div>
 
@@ -74,9 +96,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
           <div className="w-10 h-10 rounded-xl bg-coral-100 flex items-center justify-center text-coral-700 mb-3">
             <Sliders className="w-5 h-5" />
           </div>
-          <h2 className="font-semibold text-plum-950 mb-1 text-base">Code Owns The Math</h2>
+          <h2 className="font-semibold text-plum-950 mb-1 text-base">
+            Code Owns The Math
+          </h2>
           <p className="text-xs text-stone-700 leading-relaxed">
-            Rescales budget lines to sum exactly to the penny. What-if slider updates instantly without AI calls.
+            Rescales budget lines to sum exactly to the penny. What-if slider
+            updates instantly without AI calls.
           </p>
         </div>
 
@@ -84,9 +109,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
           <div className="w-10 h-10 rounded-xl bg-champagne-200 flex items-center justify-center text-amber-900 mb-3">
             <Users className="w-5 h-5" />
           </div>
-          <h2 className="font-semibold text-plum-950 mb-1 text-base">Guest & RSVP Costing</h2>
+          <h2 className="font-semibold text-plum-950 mb-1 text-base">
+            Guest & RSVP Costing
+          </h2>
           <p className="text-xs text-stone-700 leading-relaxed">
-            Tracks confirmed headcount, dietary needs breakdown, and auto-calculates per-head cost dynamically.
+            Tracks confirmed headcount, dietary needs breakdown, and
+            auto-calculates per-head cost dynamically.
           </p>
         </div>
 
@@ -94,9 +122,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
           <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800 mb-3">
             <Share2 className="w-5 h-5 text-emerald-700" />
           </div>
-          <h2 className="font-semibold text-plum-950 mb-1 text-base">Compressed URL Sharing</h2>
+          <h2 className="font-semibold text-plum-950 mb-1 text-base">
+            Compressed URL Sharing
+          </h2>
           <p className="text-xs text-stone-700 leading-relaxed">
-            Encodes the whole event into a shareable read-only link without requiring a server database or login.
+            Encodes the whole event into a shareable read-only link without
+            requiring a server database or login.
           </p>
         </div>
       </div>
@@ -104,22 +135,52 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
       {/* Quick Event Category Cards */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-serif font-bold text-plum-950">Select Event Type to Begin</h2>
-          <span className="text-xs text-stone-700">Pre-tailored budget weights & schemas</span>
+          <h2 className="text-lg font-serif font-bold text-plum-950">
+            Select Event Type to Begin
+          </h2>
+          <span className="text-xs text-stone-700">
+            Pre-tailored budget weights & schemas
+          </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
-            { type: 'college_fest' as EventType, label: 'College Fest', desc: 'Aura \'26 Sample', emoji: '🎸', badge: 'Demo Ready' },
-            { type: 'wedding' as EventType, label: 'Wedding & Sangeet', desc: 'Opulent & Multi-day', emoji: '💍' },
-            { type: 'birthday' as EventType, label: 'Birthday Party', desc: 'Interactive & Fun', emoji: '🎂' },
-            { type: 'anniversary' as EventType, label: 'Anniversary Gala', desc: 'Elegant & Intimate', emoji: '🥂' },
-            { type: 'community' as EventType, label: 'Community Event', desc: 'Inclusive & Cultural', emoji: '🎪' },
+            {
+              type: "college_fest" as EventType,
+              label: "College Fest",
+              desc: "Aura '26 Sample",
+              emoji: "🎸",
+              badge: "Demo Ready",
+            },
+            {
+              type: "wedding" as EventType,
+              label: "Wedding & Sangeet",
+              desc: "Opulent & Multi-day",
+              emoji: "💍",
+            },
+            {
+              type: "birthday" as EventType,
+              label: "Birthday Party",
+              desc: "Interactive & Fun",
+              emoji: "🎂",
+            },
+            {
+              type: "anniversary" as EventType,
+              label: "Anniversary Gala",
+              desc: "Elegant & Intimate",
+              emoji: "🥂",
+            },
+            {
+              type: "community" as EventType,
+              label: "Community Event",
+              desc: "Inclusive & Cultural",
+              emoji: "🎪",
+            },
           ].map((item) => (
             <button
               key={item.type}
               onClick={() => {
-                if (item.type === 'college_fest') {
+                if (item.type === "college_fest") {
                   onLoadSample();
                 } else {
                   onStartNew(item.type);
@@ -147,4 +208,3 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onStartNew, onLoadSamp
     </div>
   );
 };
-

@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { X, Sparkles, AlertCircle, Calendar, Users, DollarSign, MapPin, Palette, HeartHandshake } from 'lucide-react';
-import { EventFormInput, EventType } from '../types';
-import { eventFormSchema } from '../lib/schemas';
-import { getSampleEventDate } from '../lib/sampleData';
+import React, { useState, useEffect } from "react";
+import {
+  X,
+  Sparkles,
+  AlertCircle,
+  Calendar,
+  Users,
+  DollarSign,
+  MapPin,
+  Palette,
+  HeartHandshake,
+} from "lucide-react";
+import { EventFormInput, EventType } from "../types";
+import { eventFormSchema } from "../lib/schemas";
+import { getSampleEventDate } from "../lib/sampleData";
 
 interface EventFormModalProps {
   isOpen: boolean;
@@ -12,42 +22,47 @@ interface EventFormModalProps {
 }
 
 const DIETARY_OPTIONS = [
-  'Pure Veg',
-  'Jain Option',
-  'Halal',
-  'Gluten-Free',
-  'Vegan',
-  'Nut-Free',
-  'Non-Veg Accommodated'
+  "Pure Veg",
+  "Jain Option",
+  "Halal",
+  "Gluten-Free",
+  "Vegan",
+  "Nut-Free",
+  "Non-Veg Accommodated",
 ];
 
 const ACCESSIBILITY_OPTIONS = [
-  'Wheelchair Ramps & Wide Aisles',
-  'Quiet Sensory-Friendly Space',
-  'Ground Floor / Elevator Access',
-  'Sign Language / Audio Assist',
-  'Dedicated Elder Seating Area'
+  "Wheelchair Ramps & Wide Aisles",
+  "Quiet Sensory-Friendly Space",
+  "Ground Floor / Elevator Access",
+  "Sign Language / Audio Assist",
+  "Dedicated Elder Seating Area",
 ];
 
 export const EventFormModal: React.FC<EventFormModalProps> = ({
   isOpen,
-  initialType = 'wedding',
+  initialType = "wedding",
   onClose,
   onSubmit,
 }) => {
   const [formData, setFormData] = useState<EventFormInput>({
     eventType: initialType,
-    name: '',
+    name: "",
     date: getSampleEventDate(),
-    city: 'Bengaluru',
+    city: "Bengaluru",
     guests: 150,
     budget: 150000,
-    currency: '₹',
-    theme: 'Warm Festive Glow',
-    dietary: ['Pure Veg', 'Jain Option'],
-    accessibility: ['Wheelchair Ramps & Wide Aisles', 'Ground Floor / Elevator Access'],
-    culturalPreferences: 'Traditional festive rituals with modern evening acoustics',
-    specialRequests: 'Include outdoor weather contingency and dedicated parking lanes',
+    currency: "₹",
+    theme: "Warm Festive Glow",
+    dietary: ["Pure Veg", "Jain Option"],
+    accessibility: [
+      "Wheelchair Ramps & Wide Aisles",
+      "Ground Floor / Elevator Access",
+    ],
+    culturalPreferences:
+      "Traditional festive rituals with modern evening acoustics",
+    specialRequests:
+      "Include outdoor weather contingency and dedicated parking lanes",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -80,18 +95,23 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
   const handleFillCollegeFest = () => {
     setFormData({
-      eventType: 'college_fest',
+      eventType: "college_fest",
       name: "Aura '26: Annual Inter-College Cultural & Arts Fest",
       date: getSampleEventDate(),
-      city: 'Bengaluru',
+      city: "Bengaluru",
       guests: 250,
       budget: 50000,
-      currency: '₹',
-      theme: 'Retro Neon Waves & Indie Fusion',
-      dietary: ['Pure Veg', 'Jain Option', 'Gluten-Free'],
-      accessibility: ['Wheelchair Ramps & Wide Aisles', 'Quiet Sensory-Friendly Space'],
-      culturalPreferences: 'Youth collegiate fest: Battle of the bands, street play, DJ night',
-      specialRequests: 'Acoustic stage coverage, student volunteer coordination, noise curfew at 10 PM',
+      currency: "₹",
+      theme: "Retro Neon Waves & Indie Fusion",
+      dietary: ["Pure Veg", "Jain Option", "Gluten-Free"],
+      accessibility: [
+        "Wheelchair Ramps & Wide Aisles",
+        "Quiet Sensory-Friendly Space",
+      ],
+      culturalPreferences:
+        "Youth collegiate fest: Battle of the bands, street play, DJ night",
+      specialRequests:
+        "Acoustic stage coverage, student volunteer coordination, noise curfew at 10 PM",
     });
     setErrors({});
   };
@@ -130,10 +150,15 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               <Sparkles className="w-4 h-4 text-coral-200" />
             </div>
             <div>
-              <h2 id="modal-title" className="font-serif font-bold text-xl text-white">
+              <h2
+                id="modal-title"
+                className="font-serif font-bold text-xl text-white"
+              >
                 Plan a New Celebration
               </h2>
-              <p className="text-xs text-coral-100">Parallel GenAI generation with code-owned math</p>
+              <p className="text-xs text-coral-100">
+                Parallel GenAI generation with code-owned math
+              </p>
             </div>
           </div>
 
@@ -158,17 +183,28 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 space-y-5 max-h-[80vh] overflow-y-auto"
+        >
           {/* Event Type & Name */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="eventType" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              <label
+                htmlFor="eventType"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5"
+              >
                 Event Type <span className="text-coral-600">*</span>
               </label>
               <select
                 id="eventType"
                 value={formData.eventType}
-                onChange={(e) => setFormData({ ...formData, eventType: e.target.value as EventType })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    eventType: e.target.value as EventType,
+                  })
+                }
                 className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-hidden focus:ring-2 focus:ring-coral-500 bg-white"
               >
                 <option value="wedding">💍 Wedding & Sangeet</option>
@@ -180,7 +216,10 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="name" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              <label
+                htmlFor="name"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5"
+              >
                 Event Name <span className="text-coral-600">*</span>
               </label>
               <input
@@ -188,19 +227,31 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 type="text"
                 placeholder="e.g., Aarav & Maya's Sangeet Celebration"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className={`w-full px-3 py-2 text-sm rounded-xl border ${
-                  errors.name ? 'border-coral-500 bg-coral-50/30' : 'border-stone-300'
+                  errors.name
+                    ? "border-coral-500 bg-coral-50/30"
+                    : "border-stone-300"
                 } focus:outline-hidden focus:ring-2 focus:ring-coral-500`}
               />
-              {errors.name && <p className="text-xs text-coral-600 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
+              {errors.name && (
+                <p className="text-xs text-coral-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.name}
+                </p>
+              )}
             </div>
           </div>
 
           {/* Date, City, Guests */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="date" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1">
+              <label
+                htmlFor="date"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1"
+              >
                 <Calendar className="w-3.5 h-3.5 text-stone-700" />
                 <span>Date</span> <span className="text-coral-600">*</span>
               </label>
@@ -208,35 +259,54 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 id="date"
                 type="date"
                 value={formData.date}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={(e) =>
+                  setFormData({ ...formData, date: e.target.value })
+                }
                 className={`w-full px-3 py-2 text-sm rounded-xl border ${
-                  errors.date ? 'border-coral-500 bg-coral-50/30' : 'border-stone-300'
+                  errors.date
+                    ? "border-coral-500 bg-coral-50/30"
+                    : "border-stone-300"
                 } focus:outline-hidden focus:ring-2 focus:ring-coral-500`}
               />
-              {errors.date && <p className="text-xs text-coral-600 mt-1">{errors.date}</p>}
+              {errors.date && (
+                <p className="text-xs text-coral-600 mt-1">{errors.date}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="city" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1">
+              <label
+                htmlFor="city"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1"
+              >
                 <MapPin className="w-3.5 h-3.5 text-stone-700" />
-                <span>City / Venue</span> <span className="text-coral-600">*</span>
+                <span>City / Venue</span>{" "}
+                <span className="text-coral-600">*</span>
               </label>
               <input
                 id="city"
                 type="text"
                 placeholder="e.g. Bengaluru, Mumbai, Delhi"
                 value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, city: e.target.value })
+                }
                 className={`w-full px-3 py-2 text-sm rounded-xl border ${
-                  errors.city ? 'border-coral-500 bg-coral-50/30' : 'border-stone-300'
+                  errors.city
+                    ? "border-coral-500 bg-coral-50/30"
+                    : "border-stone-300"
                 } focus:outline-hidden focus:ring-2 focus:ring-coral-500`}
               />
-              {errors.city && <p className="text-xs text-coral-600 mt-1">{errors.city}</p>}
+              {errors.city && (
+                <p className="text-xs text-coral-600 mt-1">{errors.city}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="guests" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1">
+              <label
+                htmlFor="guests"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1"
+              >
                 <Users className="w-3.5 h-3.5 text-stone-700" />
                 <span>Guests</span> <span className="text-coral-600">*</span>
               </label>
@@ -246,25 +316,39 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 min="1"
                 max="200000"
                 value={formData.guests}
-                onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    guests: parseInt(e.target.value) || 0,
+                  })
+                }
                 className={`w-full px-3 py-2 text-sm rounded-xl border ${
-                  errors.guests ? 'border-coral-500 bg-coral-50/30' : 'border-stone-300'
+                  errors.guests
+                    ? "border-coral-500 bg-coral-50/30"
+                    : "border-stone-300"
                 } focus:outline-hidden focus:ring-2 focus:ring-coral-500`}
               />
-              {errors.guests && <p className="text-xs text-coral-600 mt-1">{errors.guests}</p>}
+              {errors.guests && (
+                <p className="text-xs text-coral-600 mt-1">{errors.guests}</p>
+              )}
             </div>
           </div>
 
           {/* Budget & Currency */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
-              <label htmlFor="currency" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              <label
+                htmlFor="currency"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5"
+              >
                 Currency
               </label>
               <select
                 id="currency"
                 value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, currency: e.target.value })
+                }
                 className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-hidden focus:ring-2 focus:ring-coral-500 bg-white"
               >
                 <option value="₹">₹ INR (Rupees)</option>
@@ -276,9 +360,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="budget" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1">
+              <label
+                htmlFor="budget"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1"
+              >
                 <DollarSign className="w-3.5 h-3.5 text-stone-700" />
-                <span>Total Budget ({formData.currency})</span> <span className="text-coral-600">*</span>
+                <span>Total Budget ({formData.currency})</span>{" "}
+                <span className="text-coral-600">*</span>
               </label>
               <input
                 id="budget"
@@ -286,18 +374,30 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 min="500"
                 step="500"
                 value={formData.budget}
-                onChange={(e) => setFormData({ ...formData, budget: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    budget: parseInt(e.target.value) || 0,
+                  })
+                }
                 className={`w-full px-3 py-2 text-sm rounded-xl border ${
-                  errors.budget ? 'border-coral-500 bg-coral-50/30' : 'border-stone-300'
+                  errors.budget
+                    ? "border-coral-500 bg-coral-50/30"
+                    : "border-stone-300"
                 } focus:outline-hidden focus:ring-2 focus:ring-coral-500`}
               />
-              {errors.budget && <p className="text-xs text-coral-600 mt-1">{errors.budget}</p>}
+              {errors.budget && (
+                <p className="text-xs text-coral-600 mt-1">{errors.budget}</p>
+              )}
             </div>
           </div>
 
           {/* Theme & Vibe */}
           <div>
-            <label htmlFor="theme" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1">
+            <label
+              htmlFor="theme"
+              className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 flex items-center gap-1"
+            >
               <Palette className="w-3.5 h-3.5 text-stone-700" />
               <span>Theme / Aesthetic Vibe</span>
             </label>
@@ -306,7 +406,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               type="text"
               placeholder="e.g. Royal Marigold & Pastel Silk, Neon Cyberpunk, Rustic Garden Party"
               value={formData.theme}
-              onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, theme: e.target.value })
+              }
               className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-hidden focus:ring-2 focus:ring-coral-500"
             />
           </div>
@@ -326,11 +428,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     onClick={() => handleDietaryToggle(item)}
                     className={`px-3 py-1 text-xs rounded-full border transition-all ${
                       isSelected
-                        ? 'bg-plum-900 text-white border-plum-950 font-medium'
-                        : 'bg-ivory-200 text-stone-700 border-ivory-300 hover:bg-ivory-300'
+                        ? "bg-plum-900 text-white border-plum-950 font-medium"
+                        : "bg-ivory-200 text-stone-700 border-ivory-300 hover:bg-ivory-300"
                     }`}
                   >
-                    {isSelected ? '✓ ' : '+ '} {item}
+                    {isSelected ? "✓ " : "+ "} {item}
                   </button>
                 );
               })}
@@ -350,7 +452,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   <label
                     key={item}
                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs border cursor-pointer transition-colors ${
-                      isChecked ? 'bg-coral-50 border-coral-300 text-coral-900 font-medium' : 'bg-white border-stone-200 text-stone-700'
+                      isChecked
+                        ? "bg-coral-50 border-coral-300 text-coral-900 font-medium"
+                        : "bg-white border-stone-200 text-stone-700"
                     }`}
                   >
                     <input
@@ -369,7 +473,10 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           {/* Cultural Preferences & Special Requests */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="cultural" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              <label
+                htmlFor="cultural"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5"
+              >
                 Cultural / Music Preferences
               </label>
               <textarea
@@ -377,13 +484,21 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 rows={2}
                 placeholder="e.g. Traditional Nadhaswaram entry, Punjabi Sangeet beats, Indie rock bands"
                 value={formData.culturalPreferences}
-                onChange={(e) => setFormData({ ...formData, culturalPreferences: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    culturalPreferences: e.target.value,
+                  })
+                }
                 className="w-full px-3 py-2 text-xs rounded-xl border border-stone-300 focus:outline-hidden focus:ring-2 focus:ring-coral-500"
               />
             </div>
 
             <div>
-              <label htmlFor="special" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              <label
+                htmlFor="special"
+                className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5"
+              >
                 Special Requests & Constraints
               </label>
               <textarea
@@ -391,7 +506,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 rows={2}
                 placeholder="e.g. Rain-proof canopy, elderly drop-off zone, 10 PM sound curfew"
                 value={formData.specialRequests}
-                onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, specialRequests: e.target.value })
+                }
                 className="w-full px-3 py-2 text-xs rounded-xl border border-stone-300 focus:outline-hidden focus:ring-2 focus:ring-coral-500"
               />
             </div>
@@ -419,4 +536,3 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
     </div>
   );
 };
-

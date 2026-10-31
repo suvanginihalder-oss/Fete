@@ -1,6 +1,17 @@
-import React from 'react';
-import { X, Calendar, MapPin, Users, DollarSign, Trash2, ArrowRight, FolderHeart, PlusCircle, Sparkles } from 'lucide-react';
-import { EventPlan } from '../types';
+import React from "react";
+import {
+  X,
+  Calendar,
+  MapPin,
+  Users,
+  DollarSign,
+  Trash2,
+  ArrowRight,
+  FolderHeart,
+  PlusCircle,
+  Sparkles,
+} from "lucide-react";
+import { EventPlan } from "../types";
 
 interface SavedPlansDrawerProps {
   isOpen: boolean;
@@ -37,8 +48,12 @@ export const SavedPlansDrawer: React.FC<SavedPlansDrawerProps> = ({
           <div className="flex items-center gap-2.5">
             <FolderHeart className="w-5 h-5 text-coral-400" />
             <div>
-              <h3 className="font-serif font-bold text-base text-white">Saved Events Dashboard</h3>
-              <p className="text-[11px] text-plum-200">Persisted locally ({plans.length})</p>
+              <h3 className="font-serif font-bold text-base text-white">
+                Saved Events Dashboard
+              </h3>
+              <p className="text-[11px] text-plum-200">
+                Persisted locally ({plans.length})
+              </p>
             </div>
           </div>
 
@@ -83,9 +98,12 @@ export const SavedPlansDrawer: React.FC<SavedPlansDrawerProps> = ({
           {plans.length === 0 ? (
             <div className="text-center py-12 px-4 space-y-3">
               <FolderHeart className="w-12 h-12 text-stone-300 mx-auto" />
-              <h4 className="font-serif font-bold text-stone-700">No Saved Events Yet</h4>
+              <h4 className="font-serif font-bold text-stone-700">
+                No Saved Events Yet
+              </h4>
               <p className="text-xs text-stone-700 max-w-xs mx-auto">
-                Create a new event blueprint or load the college cultural fest sample to get started.
+                Create a new event blueprint or load the college cultural fest
+                sample to get started.
               </p>
             </div>
           ) : (
@@ -101,18 +119,20 @@ export const SavedPlansDrawer: React.FC<SavedPlansDrawerProps> = ({
                   }}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer relative group ${
                     isActive
-                      ? 'bg-plum-50/80 border-plum-400 shadow-soft ring-1 ring-plum-400'
-                      : 'bg-white border-ivory-300 hover:border-plum-300 shadow-2xs'
+                      ? "bg-plum-50/80 border-plum-400 shadow-soft ring-1 ring-plum-400"
+                      : "bg-white border-ivory-300 hover:border-plum-300 shadow-2xs"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-plum-100 text-plum-900">
-                          {p.input.eventType.replace('_', ' ')}
+                          {p.input.eventType.replace("_", " ")}
                         </span>
                         {isActive && (
-                          <span className="text-[10px] font-semibold text-coral-600">Active</span>
+                          <span className="text-[10px] font-semibold text-coral-600">
+                            Active
+                          </span>
                         )}
                       </div>
                       <h4 className="font-bold text-sm text-plum-950 group-hover:text-coral-600 transition-colors">
@@ -162,4 +182,3 @@ export const SavedPlansDrawer: React.FC<SavedPlansDrawerProps> = ({
     </div>
   );
 };
-

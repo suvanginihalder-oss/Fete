@@ -1,4 +1,5 @@
-export type EventType = 'wedding' | 'birthday' | 'anniversary' | 'college_fest' | 'community';
+export type EventType =
+  "wedding" | "birthday" | "anniversary" | "college_fest" | "community";
 
 export interface EventFormInput {
   eventType: EventType;
@@ -73,7 +74,7 @@ export interface BudgetSummary {
   warnings: string[];
 }
 
-export type TaskPriority = 'high' | 'medium' | 'low';
+export type TaskPriority = "high" | "medium" | "low";
 
 export interface RawTimelineTask {
   title: string;
@@ -99,7 +100,7 @@ export interface EventDayScheduleItem {
   notes: string;
 }
 
-export type VendorStatus = 'not_contacted' | 'shortlisted' | 'booked';
+export type VendorStatus = "not_contacted" | "shortlisted" | "booked";
 
 export interface RawVendorItem {
   serviceType: string;
@@ -125,7 +126,7 @@ export interface GuestItem {
   id: string;
   name: string;
   emailOrPhone: string;
-  status: 'confirmed' | 'pending' | 'declined';
+  status: "confirmed" | "pending" | "declined";
   dietaryNote: string;
   plusOnes: number;
 }
@@ -149,18 +150,18 @@ export interface EventPlan {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant';
+  sender: "user" | "assistant";
   timestamp: string;
   content: string;
   suggestedAction?: {
-    type: 'modify_budget' | 'add_task' | 'update_concept' | 'general';
+    type: "modify_budget" | "add_task" | "update_concept" | "general";
     label: string;
     diffSummary: string;
     applyPayload: any;
   };
 }
 
-export type SectionKey = 'concept' | 'budget' | 'timeline' | 'vendors';
+export type SectionKey = "concept" | "budget" | "timeline" | "vendors";
 
 export interface SectionStatus {
   loading: boolean;

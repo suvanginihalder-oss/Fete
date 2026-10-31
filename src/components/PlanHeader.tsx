@@ -1,6 +1,17 @@
-import React from 'react';
-import { Calendar, MapPin, Users, DollarSign, Sparkles, Share2, Printer, Download, ShieldAlert, Edit3 } from 'lucide-react';
-import { EventPlan } from '../types';
+import React from "react";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  DollarSign,
+  Sparkles,
+  Share2,
+  Printer,
+  Download,
+  ShieldAlert,
+  Edit3,
+} from "lucide-react";
+import { EventPlan } from "../types";
 
 interface PlanHeaderProps {
   plan: EventPlan;
@@ -27,8 +38,15 @@ export const PlanHeader: React.FC<PlanHeaderProps> = ({
   const eventDate = new Date(input.date);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  const countdownText = diffDays > 0 ? `${diffDays} days away` : diffDays === 0 ? 'Today!' : 'Completed';
+  const diffDays = Math.ceil(
+    (eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  const countdownText =
+    diffDays > 0
+      ? `${diffDays} days away`
+      : diffDays === 0
+        ? "Today!"
+        : "Completed";
 
   return (
     <div className="bg-white border-b border-ivory-300 shadow-soft">
@@ -37,7 +55,8 @@ export const PlanHeader: React.FC<PlanHeaderProps> = ({
         <div className="bg-amber-500/10 border-b border-amber-300/60 px-4 py-2 text-center text-xs font-semibold text-amber-900 flex items-center justify-center gap-2">
           <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
           <span>
-            {demoBannerMessage || 'Sample plan, not live AI (Demo Safety Active — zero flaky API dependencies)'}
+            {demoBannerMessage ||
+              "Sample plan, not live AI (Demo Safety Active — zero flaky API dependencies)"}
           </span>
         </div>
       )}
@@ -48,7 +67,7 @@ export const PlanHeader: React.FC<PlanHeaderProps> = ({
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-plum-100 text-plum-900 border border-plum-200">
-                {input.eventType.replace('_', ' ')}
+                {input.eventType.replace("_", " ")}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-coral-100 text-coral-800">
                 ⏳ {countdownText}
@@ -68,10 +87,10 @@ export const PlanHeader: React.FC<PlanHeaderProps> = ({
             <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-stone-700">
               <span className="flex items-center gap-1.5 font-medium">
                 <Calendar className="w-4 h-4 text-coral-600" />
-                {new Date(input.date).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
+                {new Date(input.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
                 })}
               </span>
               <span className="flex items-center gap-1.5 font-medium">
@@ -145,4 +164,3 @@ export const PlanHeader: React.FC<PlanHeaderProps> = ({
     </div>
   );
 };
-

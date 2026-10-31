@@ -1,6 +1,12 @@
-import React from 'react';
-import { Sparkles, CheckCircle2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
-import { SectionKey, SectionStatus } from '../types';
+import React from "react";
+import {
+  Sparkles,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
+import { SectionKey, SectionStatus } from "../types";
 
 interface PlanProgressModalProps {
   isOpen: boolean;
@@ -9,26 +15,32 @@ interface PlanProgressModalProps {
   onRetrySection: (section: SectionKey) => void;
 }
 
-const SECTION_CONFIG: Record<SectionKey, { title: string; subtitle: string; icon: string }> = {
+const SECTION_CONFIG: Record<
+  SectionKey,
+  { title: string; subtitle: string; icon: string }
+> = {
   concept: {
-    title: 'Section A: Concept & Vibe',
-    subtitle: 'Crafting decor theme, menu highlights, and crowd activities',
-    icon: '✨',
+    title: "Section A: Concept & Vibe",
+    subtitle: "Crafting decor theme, menu highlights, and crowd activities",
+    icon: "✨",
   },
   budget: {
-    title: 'Section B: Budget Allocation & Savings',
-    subtitle: 'Generating categories, cheaper alternatives, and code-owned math',
-    icon: '💰',
+    title: "Section B: Budget Allocation & Savings",
+    subtitle:
+      "Generating categories, cheaper alternatives, and code-owned math",
+    icon: "💰",
   },
   timeline: {
-    title: 'Section C: Timeline & Day Schedule',
-    subtitle: 'Calculating real dates, compressing intervals, and minute-by-minute plan',
-    icon: '📅',
+    title: "Section C: Timeline & Day Schedule",
+    subtitle:
+      "Calculating real dates, compressing intervals, and minute-by-minute plan",
+    icon: "📅",
   },
   vendors: {
-    title: 'Section D: Vendors & Contingencies',
-    subtitle: 'Estimating cost ranges, negotiation questions, and weather Plan B',
-    icon: '🛡️',
+    title: "Section D: Vendors & Contingencies",
+    subtitle:
+      "Estimating cost ranges, negotiation questions, and weather Plan B",
+    icon: "🛡️",
   },
 };
 
@@ -40,8 +52,10 @@ export const PlanProgressModal: React.FC<PlanProgressModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const sections: SectionKey[] = ['concept', 'budget', 'timeline', 'vendors'];
-  const completedCount = sections.filter((s) => sectionStates[s]?.completed).length;
+  const sections: SectionKey[] = ["concept", "budget", "timeline", "vendors"];
+  const completedCount = sections.filter(
+    (s) => sectionStates[s]?.completed,
+  ).length;
   const progressPercent = Math.round((completedCount / sections.length) * 100);
 
   return (
@@ -61,7 +75,8 @@ export const PlanProgressModal: React.FC<PlanProgressModalProps> = ({
             Architecting Your Event
           </h2>
           <p className="text-xs text-stone-700">
-            Running 4 parallel section calls for <span className="font-semibold text-plum-900">"{eventName}"</span>
+            Running 4 parallel section calls for{" "}
+            <span className="font-semibold text-plum-900">"{eventName}"</span>
           </p>
         </div>
 
@@ -82,7 +97,10 @@ export const PlanProgressModal: React.FC<PlanProgressModalProps> = ({
         {/* 4 Section Skeletons / States */}
         <div className="space-y-3">
           {sections.map((key) => {
-            const st = sectionStates[key] || { loading: true, completed: false };
+            const st = sectionStates[key] || {
+              loading: true,
+              completed: false,
+            };
             const cfg = SECTION_CONFIG[key];
 
             return (
@@ -90,18 +108,22 @@ export const PlanProgressModal: React.FC<PlanProgressModalProps> = ({
                 key={key}
                 className={`p-3.5 rounded-2xl border transition-all ${
                   st.completed
-                    ? 'bg-emerald-50/50 border-emerald-200'
+                    ? "bg-emerald-50/50 border-emerald-200"
                     : st.error
-                    ? 'bg-rose-50/60 border-rose-200'
-                    : 'bg-ivory-100/80 border-ivory-300'
+                      ? "bg-rose-50/60 border-rose-200"
+                      : "bg-ivory-100/80 border-ivory-300"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{cfg.icon}</span>
                     <div>
-                      <p className="text-xs font-bold text-plum-950">{cfg.title}</p>
-                      <p className="text-[11px] text-stone-700">{cfg.subtitle}</p>
+                      <p className="text-xs font-bold text-plum-950">
+                        {cfg.title}
+                      </p>
+                      <p className="text-[11px] text-stone-700">
+                        {cfg.subtitle}
+                      </p>
                     </div>
                   </div>
 
@@ -143,10 +165,10 @@ export const PlanProgressModal: React.FC<PlanProgressModalProps> = ({
         </div>
 
         <p className="text-[11px] text-center text-stone-700">
-          Timeout safeguards active. If network restricts live AI, local sample data is safely loaded without crashing.
+          Timeout safeguards active. If network restricts live AI, local sample
+          data is safely loaded without crashing.
         </p>
       </div>
     </div>
   );
 };
-

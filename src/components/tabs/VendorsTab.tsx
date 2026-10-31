@@ -1,6 +1,14 @@
-import React from 'react';
-import { Briefcase, CloudRain, Lightbulb, CheckSquare, MessageCircle, DollarSign, ShieldAlert } from 'lucide-react';
-import { VendorItem, WeatherPlanB, VendorStatus } from '../../types';
+import React from "react";
+import {
+  Briefcase,
+  CloudRain,
+  Lightbulb,
+  CheckSquare,
+  MessageCircle,
+  DollarSign,
+  ShieldAlert,
+} from "lucide-react";
+import { VendorItem, WeatherPlanB, VendorStatus } from "../../types";
 
 interface VendorsTabProps {
   vendors: VendorItem[];
@@ -21,13 +29,17 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
 }) => {
   const handleStatusChange = (id: string, newStatus: VendorStatus) => {
     if (isReadOnly) return;
-    const updated = vendors.map((v) => (v.id === id ? { ...v, status: newStatus } : v));
+    const updated = vendors.map((v) =>
+      v.id === id ? { ...v, status: newStatus } : v,
+    );
     onUpdateVendors(updated);
   };
 
   const handleBookedCostChange = (id: string, amount: number) => {
     if (isReadOnly) return;
-    const updated = vendors.map((v) => (v.id === id ? { ...v, bookedCost: amount } : v));
+    const updated = vendors.map((v) =>
+      v.id === id ? { ...v, bookedCost: amount } : v,
+    );
     onUpdateVendors(updated);
   };
 
@@ -41,12 +53,16 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-serif font-bold text-xl text-amber-950">Weather Plan B & Rain Contingency</h3>
+              <h3 className="font-serif font-bold text-xl text-amber-950">
+                Weather Plan B & Rain Contingency
+              </h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
                 Risk Management
               </span>
             </div>
-            <p className="text-xs text-amber-900 mt-0.5">{weatherPlanB.riskAssessment}</p>
+            <p className="text-xs text-amber-900 mt-0.5">
+              {weatherPlanB.riskAssessment}
+            </p>
           </div>
         </div>
 
@@ -58,7 +74,10 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
             </span>
             <ul className="space-y-1.5">
               {weatherPlanB.contingencySteps.map((step, idx) => (
-                <li key={idx} className="text-xs text-stone-800 flex items-start gap-2">
+                <li
+                  key={idx}
+                  className="text-xs text-stone-800 flex items-start gap-2"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 shrink-0" />
                   <span>{step}</span>
                 </li>
@@ -73,7 +92,10 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
             </span>
             <ul className="space-y-1.5">
               {weatherPlanB.backupVenuesOrGear.map((item, idx) => (
-                <li key={idx} className="text-xs text-stone-800 flex items-start gap-2">
+                <li
+                  key={idx}
+                  className="text-xs text-stone-800 flex items-start gap-2"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 shrink-0" />
                   <span>{item}</span>
                 </li>
@@ -88,10 +110,13 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-plum-900" />
-            <h3 className="font-serif font-bold text-xl text-plum-950">Vendor Categories & Negotiation Checklist</h3>
+            <h3 className="font-serif font-bold text-xl text-plum-950">
+              Vendor Categories & Negotiation Checklist
+            </h3>
           </div>
           <span className="text-xs text-stone-700">
-            *Objective price ranges & strategic questions. No fabricated provider listings.
+            *Objective price ranges & strategic questions. No fabricated
+            provider listings.
           </span>
         </div>
 
@@ -103,7 +128,9 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h4 className="font-semibold text-lg text-plum-950">{vendor.serviceType}</h4>
+                  <h4 className="font-semibold text-lg text-plum-950">
+                    {vendor.serviceType}
+                  </h4>
                   <span className="inline-block mt-1 text-xs font-mono font-bold text-coral-700 bg-coral-50 px-2 py-0.5 rounded border border-coral-200">
                     Est. Range: {vendor.estCostRange}
                   </span>
@@ -113,18 +140,23 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
                 <div>
                   {isReadOnly ? (
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold capitalize bg-plum-100 text-plum-900">
-                      {vendor.status.replace('_', ' ')}
+                      {vendor.status.replace("_", " ")}
                     </span>
                   ) : (
                     <select
                       value={vendor.status}
-                      onChange={(e) => handleStatusChange(vendor.id, e.target.value as VendorStatus)}
+                      onChange={(e) =>
+                        handleStatusChange(
+                          vendor.id,
+                          e.target.value as VendorStatus,
+                        )
+                      }
                       className={`text-xs font-semibold px-2.5 py-1 rounded-xl border ${
-                        vendor.status === 'booked'
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                          : vendor.status === 'shortlisted'
-                          ? 'bg-amber-50 border-amber-300 text-amber-900'
-                          : 'bg-ivory-200 border-ivory-300 text-stone-700'
+                        vendor.status === "booked"
+                          ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                          : vendor.status === "shortlisted"
+                            ? "bg-amber-50 border-amber-300 text-amber-900"
+                            : "bg-ivory-200 border-ivory-300 text-stone-700"
                       }`}
                     >
                       <option value="not_contacted">Not Contacted</option>
@@ -143,7 +175,10 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
                 </span>
                 <ul className="space-y-2">
                   {vendor.questionsToAsk.map((q, qIdx) => (
-                    <li key={qIdx} className="text-xs text-stone-700 flex items-start gap-2 bg-ivory-100/60 p-2.5 rounded-xl border border-ivory-200">
+                    <li
+                      key={qIdx}
+                      className="text-xs text-stone-700 flex items-start gap-2 bg-ivory-100/60 p-2.5 rounded-xl border border-ivory-200"
+                    >
                       <CheckSquare className="w-3.5 h-3.5 text-coral-600 mt-0.5 shrink-0" />
                       <span>{q}</span>
                     </li>
@@ -152,16 +187,25 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
               </div>
 
               {/* Booked Cost input if booked */}
-              {vendor.status === 'booked' && !isReadOnly && (
+              {vendor.status === "booked" && !isReadOnly && (
                 <div className="pt-2 flex items-center justify-between text-xs bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-200">
-                  <span className="font-semibold text-emerald-900">Contract Final Cost:</span>
+                  <span className="font-semibold text-emerald-900">
+                    Contract Final Cost:
+                  </span>
                   <div className="flex items-center gap-1">
-                    <span className="font-mono text-emerald-900">{currency}</span>
+                    <span className="font-mono text-emerald-900">
+                      {currency}
+                    </span>
                     <input
                       type="number"
                       placeholder="e.g. 15000"
-                      value={vendor.bookedCost || ''}
-                      onChange={(e) => handleBookedCostChange(vendor.id, parseInt(e.target.value) || 0)}
+                      value={vendor.bookedCost || ""}
+                      onChange={(e) =>
+                        handleBookedCostChange(
+                          vendor.id,
+                          parseInt(e.target.value) || 0,
+                        )
+                      }
                       className="w-24 px-2 py-0.5 text-xs rounded border border-emerald-300 font-mono"
                     />
                   </div>
@@ -176,11 +220,16 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
       <div className="p-6 sm:p-8 rounded-3xl bg-white border border-ivory-300 shadow-soft space-y-4">
         <div className="flex items-center gap-2">
           <Lightbulb className="w-5 h-5 text-coral-600" />
-          <h3 className="font-serif font-bold text-lg text-plum-950">Expert Coordinator Field Insights</h3>
+          <h3 className="font-serif font-bold text-lg text-plum-950">
+            Expert Coordinator Field Insights
+          </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {expertTips.map((tip, idx) => (
-            <div key={idx} className="p-3.5 rounded-2xl bg-ivory-200/50 border border-ivory-300 text-xs text-stone-800 flex items-start gap-2.5">
+            <div
+              key={idx}
+              className="p-3.5 rounded-2xl bg-ivory-200/50 border border-ivory-300 text-xs text-stone-800 flex items-start gap-2.5"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-plum-800 mt-1.5 shrink-0" />
               <span>{tip}</span>
             </div>
@@ -190,4 +239,3 @@ export const VendorsTab: React.FC<VendorsTabProps> = ({
     </div>
   );
 };
-

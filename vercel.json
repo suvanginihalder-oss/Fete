@@ -1,5 +1,13 @@
 {
   "version": 2,
+  "functions": {
+    "api/generate-plan.ts": {
+      "maxDuration": 30
+    },
+    "api/chat.ts": {
+      "maxDuration": 20
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -11,4 +19,3 @@
     }
   ]
 }
-

@@ -1,6 +1,14 @@
-import React from 'react';
-import { Palette, Utensils, Music, Sparkles, Check, Heart, Shield } from 'lucide-react';
-import { ConceptData, EventFormInput } from '../../types';
+import React from "react";
+import {
+  Palette,
+  Utensils,
+  Music,
+  Sparkles,
+  Check,
+  Heart,
+  Shield,
+} from "lucide-react";
+import { ConceptData, EventFormInput } from "../../types";
 
 interface ConceptTabProps {
   concept: ConceptData;
@@ -21,7 +29,8 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
             "{concept.tagline}"
           </h2>
           <p className="text-sm text-plum-100 leading-relaxed">
-            A bespoke celebration blending {input.theme} aesthetics with the vibrant hospitality of {input.city}.
+            A bespoke celebration blending {input.theme} aesthetics with the
+            vibrant hospitality of {input.city}.
           </p>
         </div>
         <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-10 translate-y-10">
@@ -33,7 +42,9 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <Palette className="w-5 h-5 text-coral-600" />
-          <h3 className="font-serif font-bold text-xl text-plum-950">Decor Vision & Ambiance</h3>
+          <h3 className="font-serif font-bold text-xl text-plum-950">
+            Decor Vision & Ambiance
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -44,8 +55,12 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h4 className="font-semibold text-lg text-plum-950">{item.title}</h4>
-                  <p className="text-xs text-stone-700 mt-1">{item.description}</p>
+                  <h4 className="font-semibold text-lg text-plum-950">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-stone-700 mt-1">
+                    {item.description}
+                  </p>
                 </div>
                 <span className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-plum-100 text-plum-900">
                   ~{item.estCostSharePercent}% budget
@@ -58,7 +73,10 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
                 </span>
                 <ul className="space-y-1.5">
                   {item.items.map((sub, sIdx) => (
-                    <li key={sIdx} className="text-xs text-stone-700 flex items-center gap-2">
+                    <li
+                      key={sIdx}
+                      className="text-xs text-stone-700 flex items-center gap-2"
+                    >
                       <span className="w-1.5 h-1.5 rounded-full bg-coral-500" />
                       <span>{sub}</span>
                     </li>
@@ -78,15 +96,22 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
               <Utensils className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-xl text-plum-950">{concept.food.title}</h3>
-              <p className="text-xs text-stone-700">Catering tailored for {input.guests} guests in {input.city}</p>
+              <h3 className="font-serif font-bold text-xl text-plum-950">
+                {concept.food.title}
+              </h3>
+              <p className="text-xs text-stone-700">
+                Catering tailored for {input.guests} guests in {input.city}
+              </p>
             </div>
           </div>
 
           {input.dietary.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
               {input.dietary.map((d) => (
-                <span key={d} className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                <span
+                  key={d}
+                  className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800"
+                >
                   ✓ {d}
                 </span>
               ))}
@@ -105,9 +130,14 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {concept.food.highlights.map((dish, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-ivory-200/60 border border-ivory-300">
+              <div
+                key={idx}
+                className="flex items-start gap-2.5 p-3 rounded-xl bg-ivory-200/60 border border-ivory-300"
+              >
                 <Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
-                <span className="text-xs text-stone-800 font-medium">{dish}</span>
+                <span className="text-xs text-stone-800 font-medium">
+                  {dish}
+                </span>
               </div>
             ))}
           </div>
@@ -117,7 +147,9 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
         <div className="p-4 rounded-2xl bg-champagne-100/80 border border-champagne-300 text-xs text-stone-800 flex items-start gap-3">
           <Shield className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
           <div>
-            <strong className="font-semibold text-plum-950">Dietary Safety Accommodation:</strong>{' '}
+            <strong className="font-semibold text-plum-950">
+              Dietary Safety Accommodation:
+            </strong>{" "}
             {concept.food.dietaryAccommodations}
           </div>
         </div>
@@ -129,15 +161,23 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
         <div className="p-6 rounded-3xl bg-white border border-ivory-300 shadow-soft space-y-4">
           <div className="flex items-center gap-2">
             <Music className="w-5 h-5 text-plum-800" />
-            <h3 className="font-serif font-bold text-lg text-plum-950">{concept.entertainment.title}</h3>
+            <h3 className="font-serif font-bold text-lg text-plum-950">
+              {concept.entertainment.title}
+            </h3>
           </div>
-          <p className="text-xs text-stone-700">{concept.entertainment.description}</p>
+          <p className="text-xs text-stone-700">
+            {concept.entertainment.description}
+          </p>
           <div className="p-3 rounded-xl bg-plum-50/70 border border-plum-100 text-xs text-plum-900">
-            <strong>Lineup Progression:</strong> {concept.entertainment.scheduleSuggestion}
+            <strong>Lineup Progression:</strong>{" "}
+            {concept.entertainment.scheduleSuggestion}
           </div>
           <ul className="space-y-2">
             {concept.entertainment.highlights.map((hl, idx) => (
-              <li key={idx} className="text-xs text-stone-700 flex items-center gap-2">
+              <li
+                key={idx}
+                className="text-xs text-stone-700 flex items-center gap-2"
+              >
                 <span className="w-2 h-2 rounded-full bg-plum-700" />
                 <span>{hl}</span>
               </li>
@@ -149,13 +189,20 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
         <div className="p-6 rounded-3xl bg-white border border-ivory-300 shadow-soft space-y-4">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-coral-600" />
-            <h3 className="font-serif font-bold text-lg text-plum-950">Interactive Guest Activities</h3>
+            <h3 className="font-serif font-bold text-lg text-plum-950">
+              Interactive Guest Activities
+            </h3>
           </div>
           <div className="space-y-3">
             {concept.activities.map((act, idx) => (
-              <div key={idx} className="p-3 rounded-2xl bg-ivory-200/50 border border-ivory-300 space-y-1">
+              <div
+                key={idx}
+                className="p-3 rounded-2xl bg-ivory-200/50 border border-ivory-300 space-y-1"
+              >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-plum-950">{act.title}</h4>
+                  <h4 className="text-xs font-bold text-plum-950">
+                    {act.title}
+                  </h4>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-coral-100 text-coral-800 font-medium">
                     {act.targetAudience}
                   </span>
@@ -169,4 +216,3 @@ export const ConceptTab: React.FC<ConceptTabProps> = ({ concept, input }) => {
     </div>
   );
 };
-

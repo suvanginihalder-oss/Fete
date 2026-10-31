@@ -1,6 +1,13 @@
-import React from 'react';
-import { Sparkles, Calendar, FolderHeart, PlusCircle, Share2, BookOpen } from 'lucide-react';
-import { EventPlan } from '../types';
+import React from "react";
+import {
+  Sparkles,
+  Calendar,
+  FolderHeart,
+  PlusCircle,
+  Share2,
+  BookOpen,
+} from "lucide-react";
+import { EventPlan } from "../types";
 
 interface NavbarProps {
   activePlan: EventPlan | null;
@@ -38,7 +45,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 GenAI Planner
               </span>
             </div>
-            <p className="text-xs text-stone-700 hidden sm:block">Intelligent Parallel Event Architect</p>
+            <p className="text-xs text-stone-700 hidden sm:block">
+              Intelligent Parallel Event Architect
+            </p>
           </div>
         </div>
 
@@ -106,4 +115,3 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
-

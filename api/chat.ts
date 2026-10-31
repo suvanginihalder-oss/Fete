@@ -1,5 +1,5 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { callLLMProvider } from '../src/lib/ai/providerAdapter';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { callLLMProvider } from "../src/lib/ai/providerAdapter";
 
 const CHAT_SYSTEM_PROMPT = `You are EventCraft AI, an expert event planning assistant with deep knowledge of weddings, birthdays, anniversaries, college fests, and community events. You have full context of the user's event plan. 
 
@@ -40,49 +40,64 @@ Respond ONLY with valid JSON. No markdown, no prose outside the JSON.`;
 
 /** Strip markdown fences */
 function stripFences(text: string): string {
-  return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  return text
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
 }
 
 /** Fallback rule-based response when AI is unavailable */
 function fallbackResponse(message: string, plan: any): any {
   const lower = message.toLowerCase();
-  const currency = plan?.input?.currency || '₹';
-  const city = plan?.input?.city || 'your city';
-  const name = plan?.input?.name || 'your event';
-  const guests = plan?.input?.guests || 'your guests';
+  const currency = plan?.input?.currency || "₹";
+  const city = plan?.input?.city || "your city";
+  const name = plan?.input?.name || "your event";
+  const guests = plan?.input?.guests || "your guests";
 
-  if (lower.includes('budget') || lower.includes('save') || lower.includes('cost') || lower.includes('cheaper')) {
+  if (
+    lower.includes("budget") ||
+    lower.includes("save") ||
+    lower.includes("cost") ||
+    lower.includes("cheaper")
+  ) {
     return {
       reply: `I analyzed your event budget. We can optimize the Catering & Decor line items. By switching to curated live stations and leveraging in-house audio equipment, we can save approximately ${currency} 8,000 without reducing guest satisfaction.`,
       suggestedAction: {
-        type: 'modify_budget',
+        type: "modify_budget",
         label: `Apply ${currency} 8,000 Budget Optimization`,
-        diffSummary: 'Reduces Food (-5,000) & Decor (-3,000), increasing Emergency Buffer (+8,000)',
+        diffSummary:
+          "Reduces Food (-5,000) & Decor (-3,000), increasing Emergency Buffer (+8,000)",
         applyPayload: {
           categoryAdjustments: [
-            { categoryMatch: 'Food', delta: -5000 },
-            { categoryMatch: 'Decor', delta: -3000 },
-            { categoryMatch: 'Emergency', delta: 8000 },
+            { categoryMatch: "Food", delta: -5000 },
+            { categoryMatch: "Decor", delta: -3000 },
+            { categoryMatch: "Emergency", delta: 8000 },
           ],
         },
       },
     };
   }
 
-  if (lower.includes('rain') || lower.includes('weather') || lower.includes('plan b')) {
+  if (
+    lower.includes("rain") ||
+    lower.includes("weather") ||
+    lower.includes("plan b")
+  ) {
     return {
       reply: `I have drafted an enhanced Weather Plan B for ${city}. This includes booking an indoor pre-function hallway buffer and scheduling a weather alert check 36 hours prior to setup.`,
       suggestedAction: {
-        type: 'add_task',
-        label: 'Add 36-Hour Weather Check Task',
-        diffSummary: 'Adds high-priority task: "Execute Rain Check & Hall Transition Standby"',
+        type: "add_task",
+        label: "Add 36-Hour Weather Check Task",
+        diffSummary:
+          'Adds high-priority task: "Execute Rain Check & Hall Transition Standby"',
         applyPayload: {
           task: {
-            title: 'Execute Rain Check & Hall Transition Standby',
-            category: 'Safety',
+            title: "Execute Rain Check & Hall Transition Standby",
+            category: "Safety",
             dueOffsetDays: -2,
-            priority: 'high',
-            notes: 'Contact venue manager to confirm dry storage for electrical fixtures.',
+            priority: "high",
+            notes:
+              "Contact venue manager to confirm dry storage for electrical fixtures.",
           },
         },
       },
@@ -96,31 +111,42 @@ function fallbackResponse(message: string, plan: any): any {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
     const { message, plan } = req.body;
     if (!message) {
-      return res.status(400).json({ success: false, error: 'Message is required' });
+      return res
+        .status(400)
+        .json({ success: false, error: "Message is required" });
     }
 
-    const provider = (process.env.LLM_PROVIDER || process.env.AI_PROVIDER || 'gemini').toLowerCase();
+    const provider = (
+      process.env.LLM_PROVIDER ||
+      process.env.AI_PROVIDER ||
+      "gemini"
+    ).toLowerCase();
     const hasKey = Boolean(
       process.env.GEMINI_API_KEY ||
       process.env.ANTHROPIC_API_KEY ||
-      process.env.OPENAI_API_KEY
+      process.env.OPENAI_API_KEY,
     );
 
     if (!hasKey) {
-      console.warn('[CelebrAI/chat] No API key found. Using fallback chat.');
+      console.warn("[CelebrAI/chat] No API key found. Using fallback chat.");
       const fallback = fallbackResponse(message, plan);
-      return res.status(200).json({ success: true, isDemo: true, data: fallback });
+      return res
+        .status(200)
+        .json({ success: true, isDemo: true, data: fallback });
     }
 
     // Build context from plan
-    const planSummary = plan ? `
+    const planSummary = plan
+      ? `
 EVENT CONTEXT:
 - Name: ${plan.input?.name}
 - Type: ${plan.input?.eventType}
@@ -131,7 +157,8 @@ EVENT CONTEXT:
 - Theme: ${plan.input?.theme}
 - Budget lines: ${JSON.stringify(plan.budget?.lines?.slice(0, 5) || [])}
 - Key tasks: ${JSON.stringify(plan.timeline?.tasks?.slice(0, 5) || [])}
-` : 'No event plan loaded.';
+`
+      : "No event plan loaded.";
 
     const userPrompt = `${planSummary}\n\nUSER MESSAGE: ${message}`;
 
@@ -150,14 +177,20 @@ EVENT CONTEXT:
         parsed = { reply: cleaned || rawOutput, suggestedAction: null };
       }
 
-      return res.status(200).json({ success: true, isDemo: false, data: parsed });
+      return res
+        .status(200)
+        .json({ success: true, isDemo: false, data: parsed });
     } catch (llmErr: any) {
-      console.error('[CelebrAI/chat] LLM error:', llmErr?.message);
+      console.error("[CelebrAI/chat] LLM error:", llmErr?.message);
       const fallback = fallbackResponse(message, plan);
-      return res.status(200).json({ success: true, isDemo: true, data: fallback });
+      return res
+        .status(200)
+        .json({ success: true, isDemo: true, data: fallback });
     }
   } catch (err: any) {
-    console.error('[CelebrAI/chat] Handler error:', err?.message);
-    return res.status(500).json({ success: false, error: err.message || 'Chat error' });
+    console.error("[CelebrAI/chat] Handler error:", err?.message);
+    return res
+      .status(500)
+      .json({ success: false, error: err.message || "Chat error" });
   }
 }

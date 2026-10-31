@@ -1,7 +1,7 @@
-import LZString from 'lz-string';
-import { EventPlan } from '../types';
+import LZString from "lz-string";
+import { EventPlan } from "../types";
 
-export type InvitationTone = 'formal' | 'casual' | 'poetic' | 'funky';
+export type InvitationTone = "formal" | "casual" | "poetic" | "funky";
 
 /**
  * Encodes an EventPlan into a compressed URL hash/query string for zero-backend sharing.
@@ -11,10 +11,10 @@ export function encodePlanToUrl(plan: EventPlan): string {
     const jsonString = JSON.stringify(plan);
     const compressed = LZString.compressToEncodedURIComponent(jsonString);
     const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('share', compressed);
+    url.searchParams.set("share", compressed);
     return url.toString();
   } catch (err) {
-    console.error('Failed to encode plan:', err);
+    console.error("Failed to encode plan:", err);
     return window.location.href;
   }
 }
@@ -24,13 +24,14 @@ export function encodePlanToUrl(plan: EventPlan): string {
  */
 export function decodePlanFromUrl(compressedStr: string): EventPlan | null {
   try {
-    const decompressed = LZString.decompressFromEncodedURIComponent(compressedStr);
+    const decompressed =
+      LZString.decompressFromEncodedURIComponent(compressedStr);
     if (!decompressed) return null;
     const plan = JSON.parse(decompressed);
     if (!plan.id || !plan.concept) return null;
     return plan;
   } catch (err) {
-    console.error('Failed to decode shared plan:', err);
+    console.error("Failed to decode shared plan:", err);
     return null;
   }
 }
@@ -38,17 +39,20 @@ export function decodePlanFromUrl(compressedStr: string): EventPlan | null {
 /**
  * Generates customizable invitation message across 4 distinct tones
  */
-export function generateInvitationText(plan: EventPlan, tone: InvitationTone = 'formal'): string {
+export function generateInvitationText(
+  plan: EventPlan,
+  tone: InvitationTone = "formal",
+): string {
   const { name, date, city, theme } = plan.input;
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   switch (tone) {
-    case 'formal':
+    case "formal":
       return `Honored Guests,
 
 You are cordially invited to celebrate:
@@ -56,25 +60,25 @@ ${name}
 
 Date: ${formattedDate}
 Location: ${city}
-Theme: ${theme || 'Celebratory Attire'}
+Theme: ${theme || "Celebratory Attire"}
 
 Your gracious presence will bring warmth to our celebration. Kindly confirm your attendance and any dietary requirements by RSVP.
 
 Warm regards,
 Event Organizers`;
 
-    case 'casual':
+    case "casual":
       return `Hey everyone! 🎉
 
 We're gathering to celebrate ${name}!
 Mark your calendars: ${formattedDate} in ${city}.
-Vibe / Dress Code: ${theme || 'Come as you are & festive'}
+Vibe / Dress Code: ${theme || "Come as you are & festive"}
 
 Good food, great music, and unforgettable moments guaranteed. Let us know if you can make it!
 
 RSVP soon! 🙌`;
 
-    case 'poetic':
+    case "poetic":
       return `✨ "Moments fade, but memories woven with love and laughter endure forever." ✨
 
 Join us under glowing lights to celebrate:
@@ -82,17 +86,17 @@ Join us under glowing lights to celebrate:
 
 When: ${formattedDate}
 Where: ${city}
-Theme: ${theme || 'Festive Radiance'}
+Theme: ${theme || "Festive Radiance"}
 
 Let your presence be the melody to our shared joy. Please RSVP at your earliest convenience.`;
 
-    case 'funky':
+    case "funky":
       return `🚀 IT'S CELEBRATION TIME! ⚡
 ${name} is officially happening!
 
 📅 Date: ${formattedDate}
 📍 Spot: ${city}
-🎨 Mood: ${theme || 'Ultra Cool & Vibrant'}
+🎨 Mood: ${theme || "Ultra Cool & Vibrant"}
 
 Bring your highest energy, dancing shoes, and biggest smiles. Confirm your spot right now! 🕺💃`;
   }
@@ -112,4 +116,3 @@ export function generateWhatsAppLink(text: string): string {
 export function triggerPrint() {
   window.print();
 }
-

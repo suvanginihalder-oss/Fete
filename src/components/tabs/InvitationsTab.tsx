@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
-import { Share2, Copy, Check, MessageSquare, Printer, Download, Upload, FileText, Sparkles } from 'lucide-react';
-import { EventPlan } from '../../types';
-import { generateInvitationText, generateWhatsAppLink, encodePlanToUrl, triggerPrint, InvitationTone } from '../../lib/sharing';
-import { exportPlansToJSON, importPlansFromJSON } from '../../lib/storage';
+import React, { useState } from "react";
+import {
+  Share2,
+  Copy,
+  Check,
+  MessageSquare,
+  Printer,
+  Download,
+  Upload,
+  FileText,
+  Sparkles,
+} from "lucide-react";
+import { EventPlan } from "../../types";
+import {
+  generateInvitationText,
+  generateWhatsAppLink,
+  encodePlanToUrl,
+  triggerPrint,
+  InvitationTone,
+} from "../../lib/sharing";
+import { exportPlansToJSON, importPlansFromJSON } from "../../lib/storage";
 
 interface InvitationsTabProps {
   plan: EventPlan;
@@ -15,10 +31,10 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
   onImportComplete,
   onShowToast,
 }) => {
-  const [tone, setTone] = useState<InvitationTone>('formal');
+  const [tone, setTone] = useState<InvitationTone>("formal");
   const [copiedInvite, setCopiedInvite] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string>('');
+  const [shareUrl, setShareUrl] = useState<string>("");
 
   const invitationText = generateInvitationText(plan, tone);
   const whatsappUrl = generateWhatsAppLink(invitationText);
@@ -28,26 +44,30 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
     setShareUrl(url);
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
-    onShowToast('Compressed read-only link copied to clipboard!');
+    onShowToast("Compressed read-only link copied to clipboard!");
     setTimeout(() => setCopiedLink(false), 3000);
   };
 
   const handleCopyInvite = () => {
     navigator.clipboard.writeText(invitationText);
     setCopiedInvite(true);
-    onShowToast('Invitation message copied!');
+    onShowToast("Invitation message copied!");
     setTimeout(() => setCopiedInvite(false), 3000);
   };
 
   const handleExportJSON = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(exportPlansToJSON());
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `CelebrAI-${plan.input.name.replace(/\s+/g, '_')}-backup.json`);
+    const dataStr =
+      "data:text/json;charset=utf-8," + encodeURIComponent(exportPlansToJSON());
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute(
+      "download",
+      `CelebrAI-${plan.input.name.replace(/\s+/g, "_")}-backup.json`,
+    );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    onShowToast('Backup JSON file exported successfully.');
+    onShowToast("Backup JSON file exported successfully.");
   };
 
   const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,22 +98,27 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-xl text-plum-950">AI Invitation Generator</h3>
-              <p className="text-xs text-stone-700">Generate formatted invites in 4 distinct tones with 1-click sharing</p>
+              <h3 className="font-serif font-bold text-xl text-plum-950">
+                AI Invitation Generator
+              </h3>
+              <p className="text-xs text-stone-700">
+                Generate formatted invites in 4 distinct tones with 1-click
+                sharing
+              </p>
             </div>
           </div>
 
           {/* Tone Selector */}
           <div className="flex items-center gap-1.5 p-1 bg-ivory-200 rounded-xl">
-            {(['formal', 'casual', 'poetic', 'funky'] as const).map((t) => (
+            {(["formal", "casual", "poetic", "funky"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTone(t)}
                 type="button"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                   tone === t
-                    ? 'bg-plum-900 text-white shadow-2xs'
-                    : 'text-stone-700 hover:text-plum-900'
+                    ? "bg-plum-900 text-white shadow-2xs"
+                    : "text-stone-700 hover:text-plum-900"
                 }`}
               >
                 {t}
@@ -116,8 +141,14 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
             type="button"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-plum-900 hover:bg-plum-950 transition-colors shadow-soft"
           >
-            {copiedInvite ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4 text-coral-300" />}
-            <span>{copiedInvite ? 'Copied to Clipboard!' : 'Copy Invitation Text'}</span>
+            {copiedInvite ? (
+              <Check className="w-4 h-4 text-emerald-300" />
+            ) : (
+              <Copy className="w-4 h-4 text-coral-300" />
+            )}
+            <span>
+              {copiedInvite ? "Copied to Clipboard!" : "Copy Invitation Text"}
+            </span>
           </button>
 
           <a
@@ -139,9 +170,12 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
             <Share2 className="w-5 h-5 text-plum-800" />
           </div>
           <div>
-            <h3 className="font-serif font-bold text-xl text-plum-950">Shareable Read-Only URL</h3>
+            <h3 className="font-serif font-bold text-xl text-plum-950">
+              Shareable Read-Only URL
+            </h3>
             <p className="text-xs text-stone-700">
-              Encodes the whole event plan into a compressed browser URL hash. Zero database or login needed.
+              Encodes the whole event plan into a compressed browser URL hash.
+              Zero database or login needed.
             </p>
           </div>
         </div>
@@ -152,8 +186,14 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
             type="button"
             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-plum-900 to-coral-700 hover:from-plum-950 hover:to-coral-800 transition-all shrink-0"
           >
-            {copiedLink ? <Check className="w-4 h-4" /> : <Sparkles className="w-4 h-4 text-coral-200" />}
-            <span>{copiedLink ? 'Link Copied!' : 'Generate & Copy Share Link'}</span>
+            {copiedLink ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <Sparkles className="w-4 h-4 text-coral-200" />
+            )}
+            <span>
+              {copiedLink ? "Link Copied!" : "Generate & Copy Share Link"}
+            </span>
           </button>
 
           {shareUrl && (
@@ -173,10 +213,13 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
         <div className="p-6 rounded-3xl bg-white border border-ivory-300 shadow-soft space-y-4">
           <div className="flex items-center gap-2">
             <Printer className="w-5 h-5 text-stone-700" />
-            <h4 className="font-serif font-bold text-lg text-plum-950">Print-Friendly Summary</h4>
+            <h4 className="font-serif font-bold text-lg text-plum-950">
+              Print-Friendly Summary
+            </h4>
           </div>
           <p className="text-xs text-stone-700">
-            Formatted clean layout for paper printing or saving as a PDF document for offline coordinator use.
+            Formatted clean layout for paper printing or saving as a PDF
+            document for offline coordinator use.
           </p>
           <button
             onClick={triggerPrint}
@@ -192,10 +235,13 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
         <div className="p-6 rounded-3xl bg-white border border-ivory-300 shadow-soft space-y-4">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-stone-700" />
-            <h4 className="font-serif font-bold text-lg text-plum-950">JSON Backup Export & Import</h4>
+            <h4 className="font-serif font-bold text-lg text-plum-950">
+              JSON Backup Export & Import
+            </h4>
           </div>
           <p className="text-xs text-stone-700">
-            Full event archive backup. Easily migrate plans across devices or browsers.
+            Full event archive backup. Easily migrate plans across devices or
+            browsers.
           </p>
           <div className="flex items-center gap-3">
             <button
@@ -223,4 +269,3 @@ export const InvitationsTab: React.FC<InvitationsTabProps> = ({
     </div>
   );
 };
-
