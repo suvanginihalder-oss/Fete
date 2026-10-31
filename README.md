@@ -1,137 +1,177 @@
-# CelebrAI — Parallel GenAI Event Blueprint Architect
+# CelebrAI: Parallel GenAI Event Blueprint Architect
 
-> **Live Demo Ready** • Zero-Setup Visitor Experience • Guaranteed 4-Minute Core Flow • Demo Safety Mode (Zero Flaky API Risk)
+> Built for **PromptWars Virtual, Challenge 5: Celebration & Event Planner**
+
+🌐 **Live app:** https://fete-pink.vercel.app/
+🎥 **Demo video:** [PASTE YOUTUBE LINK]
+💻 **Source code:** [PASTE GITHUB LINK]
+
+![CelebrAI budget tab](./docs/budget-tab.png)
+
+CelebrAI turns one event idea (a wedding, birthday, college fest or community gathering) into a complete, editable plan: personalized ideas, a budget, a timeline, a vendor checklist, a guest tracker and ready-to-send invitations.
 
 ---
 
 ## 1. Problem
-Traditional event planning applications suffer from three critical bottlenecks:
-1. **Monolithic LLM Timeouts**: Generating a 20-page event plan in a single prompt takes 35–60+ seconds, consistently hitting serverless function timeouts (10s on Vercel hobby tiers).
-2. **LLM Mathematical Hallucinations**: Language models routinely fail at basic addition—budget lines often do not sum to the allocated budget, creating penny-loss discrepancies and rounding errors.
-3. **Flaky Demo Fragility**: In live demos and judging sessions, external API rate limits, expired keys, or provider outages cause white screens of death or broken forms.
+
+Planning an event means juggling budgets, deadlines, vendors and guests. AI planners help, but they run into three practical problems:
+
+1. **Long single prompts.** Generating a full plan in one request can take long enough to hit serverless time limits.
+2. **Unreliable math.** Language models often produce budget lines that do not add up to the total.
+3. **Fragile demos.** API rate limits, expired keys or provider outages can break a live demo.
 
 ---
 
-## 2. Solution: CelebrAI
-CelebrAI reimagines event planning with a **Parallel Sectioned Architecture**, **Code-Owned Mathematics**, and an automatic **Demo Safety Guard**:
+## 2. Solution
+
+CelebrAI combines a **parallel sectioned architecture**, **code-owned mathematics** and an automatic **demo safety fallback**:
 
 ```
                        User Event Form Input
                                 │
                ┌────────────────┴────────────────┐
                ▼                                 ▼
-   [Serverless Route: /api/generate-plan]   [Offline / Demo Fallback Guard]
+   [Serverless Route: /api/generate-plan]   [Demo Fallback Guard]
                │                                 │
-     4 Concurrent Worker Streams                 │
+     4 Concurrent Section Calls                  │
    ┌───────────┬───────────┬───────────┐         │
    ▼           ▼           ▼           ▼         │
 Section A   Section B   Section C   Section D    │
  Concept     Budget      Timeline    Vendors     │
    │           │           │           │         │
    └─────┬─────┴─────┬─────┴─────┬─────┘         │
-         │           │           │               │
          ▼           ▼           ▼               ▼
-   [Zod Schema Validation & Retry Guard] ◄───────┘
+   [Zod Schema Validation & Retry] ◄─────────────┘
                      │
                      ▼
-   [Deterministic Code-Owned Math Engine]
-     • Exact-to-the-cent budget line rescaling
-     • Calendar date conversions & timeline compression
-     • Guest per-head costs & dietary aggregations
+   [Code-Owned Math Engine]
+     • Budget line rescaling exact to the rupee
+     • Date conversion and timeline compression
+     • Guest counts and dietary aggregation
                      │
                      ▼
-   [CelebrAI Interactive Event Command Center]
-     • What-If Budget Slider (instant client-side recalcs)
-     • Context-Aware Assistant (1-click apply-able diffs)
-     • Compressed Read-Only URLs (lz-string, zero-backend)
-     • WhatsApp Invitations, CSV/JSON Backup, Print/PDF
+   [CelebrAI Event Workspace]
+     • What-If budget slider (instant, client-side)
+     • Context-aware AI assistant (apply-able changes)
+     • Compressed read-only share links (lz-string, no backend)
+     • WhatsApp invitations, JSON backup, print/PDF
 ```
 
 ---
 
-## 3. Key Feature Matrix
+## 3. How It Maps to the Problem Statement
 
-| Feature | Description | Architecture / Implementation |
+| Problem statement | Where in CelebrAI |
+| :--- | :--- |
+| Budgets | **Budget & What-If** tab: editable lines, charts, over-budget warnings, cheaper alternatives |
+| Timelines | **Timeline & Schedule** tab: dated checklist, priorities, event-day run sheet |
+| Vendor checklists | **Vendors & Plan B** tab: questions to ask, price ranges, status tracking, weather backup |
+| Personalized ideas | **Concept & Theme** tab and the **AI Assistant**, shaped by theme, diet, accessibility and culture |
+| Weddings, birthdays, community events | Event types in the form, with the plan tailored to the type |
+
+---
+
+## 4. Feature Overview
+
+| Feature | Description | Implementation |
 | :--- | :--- | :--- |
-| **4 Parallel Section Calls** | Concept, Budget, Timeline & Schedule, Vendors & Contingency | Parallel `Promise.all` with progressive skeleton rendering and per-section retries |
-| **Code-Owned Math** | Penny-perfect budget rescaling and integer distribution | Pure TypeScript engine (`src/lib/math.ts`) tested with Vitest |
-| **Budget What-If Slider** | Real-time budget simulation without AI re-calls | Instantly re-calculates line items, percentages, and warnings client-side |
-| **Timeline Compression** | Converts offset days to real dates & flags overdue tasks | Detects short preparation windows and compresses milestones |
-| **Guest & RSVP Costing** | Headcount metrics and auto-calculated per-head cost | Computes `Total Budget / Effective Headcount` + dietary breakdowns |
-| **Context-Aware AI Chat** | Conversational planner with 1-click diff application | Suggests structural diffs; applying re-runs budget math automatically |
-| **Invitation Suite** | Multi-tone copy generator (Formal, Casual, Poetic, Funky) | One-click clipboard copy and direct WhatsApp Web/App prefilled link |
-| **Zero-Backend Sharing** | Shareable read-only URLs without accounts or database | `lz-string` URI-safe compression encoded in browser query strings |
-| **Full Local Persistence** | All events saved in browser storage | `localStorage` abstraction layer with JSON export and import backups |
-| **Print / PDF View** | Clean printable event summary | Dedicated CSS print styles (`@media print`) stripping UI chrome |
+| **4 parallel section calls** | Concept, Budget, Timeline & Schedule, Vendors & Contingency | Concurrent requests with progressive loading and per-section retry |
+| **Code-owned math** | Budget lines always sum exactly to the total | Pure TypeScript engine (`src/lib/math.ts`) with Vitest tests |
+| **Budget What-If slider** | Simulate a different budget without any AI call | Recalculates lines, percentages and warnings in the browser |
+| **Timeline compression** | Converts offset days to real dates and flags overdue tasks | Adjusts milestones when the preparation window is short |
+| **Guest & RSVP tracker** | Headcount, RSVP status and dietary counts | Per-head cost and dietary breakdown |
+| **Context-aware AI assistant** | Ask for changes in plain language and apply them to the plan | Returns proposed changes; applying them re-runs the budget math |
+| **Invitation generator** | Formal, Casual, Poetic and Funky tones | Copy to clipboard or send through WhatsApp |
+| **Read-only share link** | Share a plan with no account or database | `lz-string` compression in the URL |
+| **Local persistence** | Events are saved in the browser | `localStorage` with JSON export and import |
+| **Print / PDF view** | Clean printable summary | Print styles (`@media print`) |
 
 ---
 
-## 4. How GenAI is Used (Architecture Deep Dive)
+## 5. Tech Stack
 
-### A. Parallel Section Calls (Avoiding Serverless Timeouts)
-Instead of requesting one giant JSON blob that triggers a 504 Gateway Timeout, CelebrAI issues four lightweight concurrent queries:
-1. **Section A (Concept & Theming)**: Tagline, decor shares, culinary highlights, entertainment, and crowd activities.
-2. **Section B (Budget Allocations)**: Category-specific expenditure weights, cheaper alternatives, and potential savings.
-3. **Section C (Timeline & Run Sheet)**: Chronological preparation tasks (`dueOffsetDays`) and minute-by-minute event-day schedule.
-4. **Section D (Vendors & Plan B)**: Service ranges, vendor negotiation questions, expert coordinator tips, and weather contingencies.
-
-### B. Strict Schema Validation (`zod`)
-Every section response is parsed against strict Zod schemas (`src/lib/schemas.ts`). If a payload fails validation, an automated retry fires immediately before falling back to local deterministic blueprints.
-
-### C. Code Owns The Math (Critical)
-LLMs cannot be trusted with financial figures. CelebrAI's `rescaleBudgetLines` function takes the AI's percentage guidance and rescales integer allocations to sum **EXACTLY** to the user's total budget. Any rounding discrepancy is programmatically applied to the highest-weight category, guaranteeing 0.00% delta.
-
----
-
-## 5. Demo Safety & Cost Control
-- **Rate-Limiting & Request Quotas**: Per-IP throttling prevents abuse and budget spikes.
-- **Auto Fallback to Demo Mode**: If API quotas, timeouts, or network failures occur, the app seamlessly switches to high-fidelity mock generators with a prominent indicator banner:
-  > `"Sample plan, not live AI (Protected by Demo Safety Mode)"`
-- **One-Click Sample Event**: The seed example (**Aura '26 College Cultural Fest**, 250 guests, ₹50,000 budget, 1 month away) is bundled locally and loads in **under 100 milliseconds** with zero external API calls.
+| Layer | Technology |
+| :--- | :--- |
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS |
+| Charts and icons | Recharts, Lucide React |
+| Validation | Zod |
+| Sharing | lz-string |
+| Backend | Vercel serverless functions (`/api/generate-plan`, `/api/chat`) |
+| GenAI | Google Gemini by default; provider adapter also supports Anthropic and OpenAI (model: [FILL IN FROM providerAdapter.ts]) |
+| Testing | Vitest |
+| Hosting | Vercel |
 
 ---
 
-## 6. Project Structure
+## 6. How GenAI Is Used
+
+### A. Parallel section calls
+Instead of one large request, CelebrAI sends four smaller ones at the same time:
+
+1. **Section A, Concept & Theme:** tagline, decor, food highlights, entertainment and activities.
+2. **Section B, Budget:** category weights, cheaper alternatives and potential savings.
+3. **Section C, Timeline & Run Sheet:** preparation tasks (`dueOffsetDays`) and the event-day schedule.
+4. **Section D, Vendors & Plan B:** price ranges, questions to ask, coordinator tips and weather contingency.
+
+### B. Schema validation
+Each section response is validated against a Zod schema (`src/lib/schemas.ts`). If validation fails, the section is retried before falling back to a local sample.
+
+### C. Code owns the math
+Language models should not be trusted with financial figures. The `rescaleBudgetLines` function takes the AI's suggested weights and rescales whole-rupee allocations so they sum exactly to the user's total budget. Any rounding difference is assigned to the largest category.
+
+---
+
+## 7. Demo Safety
+
+- **Automatic fallback.** If the AI provider is unavailable, rate-limited or returns invalid data, the app serves a locally generated sample plan and shows this banner:
+  > `Sample plan, not live AI (Protected by Demo Safety Mode)`
+- **One-click sample event.** The bundled example (**Aura '26 College Cultural Fest**, 250 guests) loads instantly from local data with no AI call.
+- **Request limits.** The API routes limit input size and request volume. [REMOVE THIS LINE IF NOT IMPLEMENTED]
+
+---
+
+## 8. Project Structure
 
 ```
 celebr-ai/
 ├── api/
-│   ├── generate-plan.ts      # Vercel serverless parallel planner route
-│   └── chat.ts               # Context-aware chat route with diff generator
+│   ├── generate-plan.ts      # Serverless parallel planner route
+│   └── chat.ts               # Context-aware assistant route
 ├── src/
 │   ├── components/
 │   │   ├── tabs/
-│   │   │   ├── ConceptTab.tsx      # Decor, catering, entertainment & activities
-│   │   │   ├── BudgetTab.tsx       # Recharts charts, what-if slider, editable table
-│   │   │   ├── TimelineTab.tsx     # Checklist, overdue flags, event-day schedule
-│   │   │   ├── GuestTrackerTab.tsx # Headcount metrics, per-head cost, dietary counts
-│   │   │   ├── VendorsTab.tsx      # Vendor questions, status toggles, weather Plan B
-│   │   │   └── InvitationsTab.tsx  # Tone selector, WhatsApp link, shareable URL
-│   │   ├── ChatAssistantDrawer.tsx # Context-aware drawer with 1-click apply diffs
-│   │   ├── EventFormModal.tsx      # Validated event input form with accessibility
-│   │   ├── LandingHero.tsx         # Welcome hero & instant demo triggers
-│   │   ├── Navbar.tsx              # Brand bar, sample loader & saved events drawer
-│   │   ├── PlanHeader.tsx          # Countdown, quick metrics & action toolbar
-│   │   ├── PlanProgressModal.tsx   # Progressive skeletons & per-section retry
-│   │   ├── SavedPlansDrawer.tsx    # Local event manager & persistence
-│   │   └── Toast.tsx               # ARIA-live alert notifications
+│   │   │   ├── ConceptTab.tsx
+│   │   │   ├── BudgetTab.tsx
+│   │   │   ├── TimelineTab.tsx
+│   │   │   ├── GuestTrackerTab.tsx
+│   │   │   ├── VendorsTab.tsx
+│   │   │   └── InvitationsTab.tsx
+│   │   ├── ChatAssistantDrawer.tsx
+│   │   ├── EventFormModal.tsx
+│   │   ├── LandingHero.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── PlanHeader.tsx
+│   │   ├── PlanProgressModal.tsx
+│   │   ├── SavedPlansDrawer.tsx
+│   │   └── Toast.tsx
 │   ├── lib/
 │   │   ├── ai/
-│   │   │   ├── providerAdapter.ts  # Unified Gemini / Claude / OpenAI adapter
-│   │   │   ├── demoGenerator.ts    # Guaranteed offline mock generator
-│   │   │   └── parallelPlanner.ts  # Concurrent worker runner & retries
-│   │   ├── math.ts                 # Code-owned budget rescaling & date conversions
-│   │   ├── sampleData.ts           # College Cultural Fest "Aura '26" seed
-│   │   ├── schemas.ts              # Zod validation schemas
-│   │   ├── sharing.ts              # lz-string compression & WhatsApp generator
-│   │   └── storage.ts              # LocalStorage manager & rate-quota guards
+│   │   │   ├── providerAdapter.ts   # Gemini / Claude / OpenAI adapter
+│   │   │   ├── demoGenerator.ts     # Offline sample generator
+│   │   │   └── parallelPlanner.ts   # Parallel runner and retries
+│   │   ├── math.ts                  # Budget rescaling and date logic
+│   │   ├── sampleData.ts            # "Aura '26" sample event
+│   │   ├── schemas.ts               # Zod schemas
+│   │   ├── sharing.ts               # Share links and WhatsApp helper
+│   │   └── storage.ts               # localStorage manager
 │   ├── tests/
-│   │   └── math.test.ts            # Vitest unit test suite (budget, dates, guests)
+│   │   └── math.test.ts
 │   ├── types/
-│   │   └── index.ts                # TypeScript domain models
-│   ├── App.tsx                     # Main application orchestrator
-│   ├── main.tsx                    # React DOM entry point
-│   └── index.css                   # Tailwind styles, print styles & animations
+│   │   └── index.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.js
@@ -141,71 +181,69 @@ celebr-ai/
 
 ---
 
-## 7. Setup & Run Locally
+## 9. Run Locally
 
-### Prerequisites
-- Node.js 18+ (tested on Node v20 LTS)
-- npm or pnpm
+**Prerequisites:** Node.js 18 or newer, and npm.
 
-### Quickstart
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Configure environment (optional - Demo mode works with zero keys)
+# 2. Configure environment (optional)
 cp .env.example .env
 
-# 3. Run unit tests
+# 3. Run tests
 npm test
 
-# 4. Start live development server
+# 4. Start the front end
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+Open http://localhost:5173.
+
+> `npm run dev` serves only the front end. The `/api` routes run on Vercel, so locally the app uses its sample-plan fallback. To run the API routes locally, use `npx vercel dev`.
 
 ---
 
-## 8. Environment Variables
+## 10. Environment Variables
 
-CelebrAI works 100% out-of-the-box in Demo Mode without setting any environment variables. To enable live AI provider streaming:
+The app runs without any keys, in sample-plan mode. To enable live AI generation, set these in `.env` locally or in your Vercel project settings:
 
 ```env
-# Default provider ('gemini' | 'anthropic' | 'openai')
+# Provider: 'gemini' | 'anthropic' | 'openai'
 LLM_PROVIDER=gemini
 
-# Google Gemini API Key (Free tier from Google AI Studio)
+# Google Gemini API key (free tier available from Google AI Studio)
 GEMINI_API_KEY=your_gemini_api_key_here
 
-# Anthropic Claude API Key (Optional)
+# Optional alternatives
 # ANTHROPIC_API_KEY=your_claude_api_key
-
-# OpenAI API Key (Optional)
 # OPENAI_API_KEY=your_openai_api_key
 ```
 
+Never commit a real key. `.env` is listed in `.gitignore`.
+
 ---
 
-## 9. Deployment to Vercel
+## 11. Deploy to Vercel
+
+1. Push the code to a public GitHub repository.
+2. Import the repository in the Vercel dashboard.
+3. Add `GEMINI_API_KEY` (and `LLM_PROVIDER`) under **Settings, Environment Variables**.
+4. Deploy. After changing a variable, redeploy so it takes effect.
+
+Or with the CLI:
 
 ```bash
-# Using Vercel CLI:
 npm i -g vercel
-vercel
-
-# Or via GitHub:
-# 1. Push code to your public GitHub repository
-# 2. Import project into Vercel Dashboard
-# 3. Add GEMINI_API_KEY under Environment Variables (optional)
-# 4. Deploy!
+vercel --prod
 ```
 
 ---
 
-## 10. Honest Limitations & Design Trade-offs
-1. **Zero Database / Auth by Design**: To ensure zero friction for first-time visitors and judges, all persistence is stored in browser `localStorage`. Multi-device synchronization requires using the **Share URL** or **JSON Export/Import** features.
-2. **Provider Availability**: In live cloud environments, if third-party LLMs rate-limit or fail, CelebrAI transparently serves structured local event plans. A visible banner informs the user that a fallback plan was loaded.
-3. **URL Length**: Extremely massive events with >100 custom vendors may produce long shared URLs. `lz-string` compresses the payload by ~65%, keeping links well within modern browser URL limits.
+## 12. Limitations
 
----
-
-
+1. **No database or login.** Plans are stored in the browser (`localStorage`). To move a plan between devices, use the share link or JSON export and import.
+2. **Sample plans without an API key.** Without a working key, or if the provider fails, plans come from the built-in sample generator, not live AI. The banner always says so.
+3. **Price figures are estimates.** Budget amounts and vendor price ranges are rough guidance, not quotes, and the app does not list real vendors.
+4. **Long share links.** Very large plans produce long URLs, even after compression.
