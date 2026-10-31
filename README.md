@@ -3,8 +3,7 @@
 > Built for **PromptWars Virtual, Challenge 5: Celebration & Event Planner**
 
 🌐 **Live app:** https://fete-pink.vercel.app/
-🎥 **Demo video:** [PASTE YOUTUBE LINK]
-💻 **Source code:** [PASTE GITHUB LINK]
+🎥 **Demo video:** https://youtu.be/bPFy4jb50o0
 
 ![CelebrAI budget tab](./docs/budget-tab.png)
 
