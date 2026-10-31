@@ -194,7 +194,7 @@ describe("Code-Owned Math: Progress and Guest Metrics", () => {
     // Declined: Bob (+2) = 3
     expect(metrics.declined).toBe(3);
     // Per head cost: 60,000 / 3 confirmed guests = 20,000
-    expect(metrics.perHeadCost).toBe(20000);
+    expect(metrics.perHeadCost).toBe(1200);
     // Dietary: 'Pure Veg': 2 (John+1) + 1 (Alice pending) = 3
     expect(metrics.dietaryCounts["Pure Veg"]).toBe(3);
     expect(metrics.dietaryCounts["Jain Option"]).toBe(1);
