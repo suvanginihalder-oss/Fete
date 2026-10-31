@@ -208,22 +208,4 @@ vercel
 
 ---
 
-## 11. Timed Demo Script (3:30 Total)
-
-- **0:00 - 0:20 (Hook)**:
-  - *"Welcome to CelebrAI, the parallel GenAI event architect. Traditional planners crash due to LLM timeouts and hallucinate budget math. CelebrAI solves both with 4 concurrent calls and code-owned math."*
-- **0:20 - 1:10 (Form & Parallel Generation)**:
-  - Click **"Load Sample Event"** (or fill the validated form). Show the instantaneous loading of **Aura '26 College Cultural Fest** (250 guests, ₹50,000 budget). Highlight the progressive skeleton indicators and zero timeout delay.
-- **1:10 - 2:00 (Budget & What-If Slider)**:
-  - Navigate to **"Budget & What-If"** tab. Show Recharts category allocations.
-  - Drag the **What-If Slider** up and down. Point out how line totals rescale instantly client-side to the exact rupee without any AI calls. Show the **"Apply -₹5,000 Cheaper Alternative"** toggle.
-- **2:00 - 2:40 (Checklist & Guest RSVP Costing)**:
-  - Navigate to **"Timeline & Schedule"**. Tick off preparation milestones; point out compressed schedule badges and overdue alerts.
-  - Switch to **"RSVP & Guests"**. Add a guest with a dietary restriction. Watch the **Per-Head Cost** recalculate dynamically.
-- **2:40 - 3:20 (AI Assistant with Diffs & URL Sharing)**:
-  - Open **"Ask AI Assistant"**. Click the prompt: *"Find ₹8,000 savings in food & decor"*.
-  - Show the returned **Diff Card**. Click **"Apply Changes"**—watch confetti pop and budget math automatically re-balance!
-  - Switch to **"Invites & Sharing"**, toggle tone from Formal to Funky, and copy the **Compressed Read-Only URL**.
-- **3:20 - 3:30 (Closing)**:
-  - Open the generated link in a new private window to prove zero-setup read-only rendering. Conclude on reliability, safety, and speed.
 
