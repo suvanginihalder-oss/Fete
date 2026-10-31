@@ -93,26 +93,34 @@ export function generateLocalSectionData(section: SectionKey, input: EventFormIn
 }
 
 /**
- * Server-side unified provider caller (for Vercel serverless function)
+ * Server-side unified provider caller (for Vercel serverless function).
+ * When config.isChat is true, schemaDescription is used as the system prompt.
  */
 export async function callLLMProvider(
   prompt: string,
   schemaDescription: string,
-  config: { provider: string; apiKey?: string; timeoutMs?: number }
+  config: { provider: string; apiKey?: string; timeoutMs?: number; isChat?: boolean }
 ): Promise<string> {
   const provider = config.provider || 'gemini';
+  const isChat = Boolean((config as any).isChat);
 
   if (provider === 'gemini') {
     const apiKey = config.apiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+    // For chat mode the schemaDescription IS the system prompt; for plan mode append the schema.
+    const systemText = isChat ? schemaDescription : SYSTEM_PROMPT;
+    const userText = isChat
+      ? prompt
+      : `${prompt}\n\nRespond with strict JSON adhering to this schema (return ONLY the JSON object):\n${schemaDescription}`;
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     const payload = {
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: [{ parts: [{ text: `${prompt}\n\nRespond with strict JSON adhering to schema: ${schemaDescription}` }] }],
+      systemInstruction: { parts: [{ text: systemText }] },
+      contents: [{ parts: [{ text: userText }] }],
       generationConfig: {
         responseMimeType: 'application/json',
-        temperature: 0.2,
+        temperature: isChat ? 0.7 : 0.2,
       },
     };
 
@@ -124,16 +132,21 @@ export async function callLLMProvider(
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(`Gemini API error: ${errText}`);
+      throw new Error(`Gemini API error ${res.status}: ${errText}`);
     }
 
     const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('Gemini returned empty content');
+    return text;
   }
 
   if (provider === 'anthropic') {
     const apiKey = config.apiKey || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set');
+
+    const systemText = isChat ? schemaDescription : SYSTEM_PROMPT;
+    const userText = isChat ? prompt : `${prompt}\n\nReturn ONLY raw JSON conforming to:\n${schemaDescription}`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -145,8 +158,8 @@ export async function callLLMProvider(
       body: JSON.stringify({
         model: 'claude-3-haiku-20240307',
         max_tokens: 1500,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: `${prompt}\n\nReturn ONLY raw JSON conforming to:\n${schemaDescription}` }],
+        system: systemText,
+        messages: [{ role: 'user', content: userText }],
       }),
     });
 
@@ -159,6 +172,9 @@ export async function callLLMProvider(
     const apiKey = config.apiKey || process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY is not set');
 
+    const systemText = isChat ? schemaDescription : SYSTEM_PROMPT;
+    const userText = isChat ? prompt : `${prompt}\n\nStrict JSON response adhering to:\n${schemaDescription}`;
+
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -168,11 +184,11 @@ export async function callLLMProvider(
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: `${prompt}\n\nStrict JSON response adhering to:\n${schemaDescription}` },
+          { role: 'system', content: systemText },
+          { role: 'user', content: userText },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.2,
+        temperature: isChat ? 0.7 : 0.2,
       }),
     });
 

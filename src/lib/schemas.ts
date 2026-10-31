@@ -50,19 +50,19 @@ export const activityIdeaSchema = z.object({
 });
 
 export const conceptDataSchema = z.object({
-  tagline: z.string().min(5),
-  decor: z.array(decorIdeaSchema).min(1),
-  food: culinaryConceptSchema,
-  entertainment: entertainmentConceptSchema,
-  activities: z.array(activityIdeaSchema).min(1),
+  tagline: z.string().min(1).catch('An unforgettable celebration'),
+  decor: z.array(decorIdeaSchema.passthrough()).min(1),
+  food: culinaryConceptSchema.passthrough(),
+  entertainment: entertainmentConceptSchema.passthrough(),
+  activities: z.array(activityIdeaSchema.passthrough()).min(1),
 });
 
 export const rawBudgetLineSchema = z.object({
-  category: z.string(),
-  item: z.string(),
-  allocatedAmount: z.number().min(0),
+  category: z.string().catch('Miscellaneous'),
+  item: z.string().catch('General'),
+  allocatedAmount: z.number().min(0).catch(0),
   actualAmount: z.number().optional().default(0),
-  percentage: z.number().min(0).max(100).optional(),
+  percentage: z.number().min(0).max(100).optional().catch(0),
   isCheaperAlternativeAvailable: z.boolean().optional().default(false),
   cheaperAlternativeNote: z.string().optional().default(''),
   potentialSavings: z.number().optional().default(0),
@@ -75,9 +75,11 @@ export const budgetSectionSchema = z.object({
 export const rawTimelineTaskSchema = z.object({
   title: z.string().min(2),
   category: z.string(),
-  dueOffsetDays: z.number().int().min(0), // days before event
-  priority: z.enum(['high', 'medium', 'low']),
-  notes: z.string().optional(),
+  // Negative = N days before event, 0 = event day, positive = after.
+  // AI returns negative offsets; we keep them as-is and convert in math.ts.
+  dueOffsetDays: z.number().int(),
+  priority: z.enum(['high', 'medium', 'low']).catch('medium'),
+  notes: z.string().optional().default(''),
 });
 
 export const dayScheduleItemSchema = z.object({
@@ -105,8 +107,12 @@ export const weatherPlanBSchema = z.object({
 });
 
 export const vendorSectionSchema = z.object({
-  vendors: z.array(rawVendorItemSchema).min(2),
-  expertTips: z.array(z.string()).min(2),
-  weatherPlanB: weatherPlanBSchema,
+  vendors: z.array(rawVendorItemSchema.passthrough()).min(2),
+  expertTips: z.array(z.string()).min(1).catch([]),
+  weatherPlanB: weatherPlanBSchema.passthrough().optional().default({
+    riskAssessment: 'Low risk. Standard indoor backup recommended.',
+    contingencySteps: ['Monitor local weather 48h before event'],
+    backupVenuesOrGear: ['Indoor hall on standby'],
+  }),
 });
 
