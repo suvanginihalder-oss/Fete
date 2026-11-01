@@ -1,15 +1,47 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { z } from "zod";
+import type { SectionKey } from "../src/types";
 import {
   callLLMProvider,
   generateLocalSectionData,
 } from "../src/lib/ai/providerAdapter.js";
+import { getErrorMessage, stripFences } from "../src/lib/ai/jsonUtils.js";
 import { eventFormSchema } from "../src/lib/schemas.js";
 
-// In-memory rate limiting: max 30 req / minute per IP
-const ipRateMap = new Map<string, { count: number; expiresAt: number }>();
+type EventFormData = z.infer<typeof eventFormSchema>;
+
+type RateLimitEntry = {
+  count: number;
+  expiresAt: number;
+};
+
+const SECTION_KEYS: readonly string[] = [
+  "concept",
+  "budget",
+  "timeline",
+  "vendors",
+];
+
+function isSectionKey(value: unknown): value is SectionKey {
+  return typeof value === "string" && SECTION_KEYS.includes(value);
+}
+
+// In-memory rate limiting: max 30 req / minute per IP with memory-leak cleanup
+const ipRateMap = new Map<string, RateLimitEntry>();
+const MAX_RATE_LIMIT_ENTRIES = 500;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+
+  // Housekeeping: prevent memory leak by purging expired keys when map grows
+  if (ipRateMap.size > MAX_RATE_LIMIT_ENTRIES) {
+    for (const [key, entry] of ipRateMap.entries()) {
+      if (entry.expiresAt < now) {
+        ipRateMap.delete(key);
+      }
+    }
+  }
+
   const entry = ipRateMap.get(ip);
   if (!entry || entry.expiresAt < now) {
     ipRateMap.set(ip, { count: 1, expiresAt: now + 60_000 });
@@ -20,49 +52,31 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-/** Remove markdown fences Gemini occasionally wraps around JSON */
-function stripFences(text: string): string {
-  return text
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/i, "")
-    .trim();
-}
-
-/** Diagnose a caught error into a short human-readable string */
-function diagnose(err: any): string {
-  const msg: string = (err?.message || String(err)).toLowerCase();
-  if (msg.includes("429") || msg.includes("quota") || msg.includes("rate"))
+/** Diagnose a caught error into a short standardized string */
+function diagnose(err: unknown): string {
+  const msg = getErrorMessage(err).toLowerCase();
+  if (/\b429\b|quota|rate[\s_-]?limit|resource_exhausted/.test(msg))
     return "rate_limited";
+  if (/timeout|timed out|abort/.test(msg)) return "timeout";
   if (
-    msg.includes("timeout") ||
-    msg.includes("abort") ||
-    msg.includes("timed out")
-  )
-    return "timeout";
-  if (
-    msg.includes("api key") ||
-    msg.includes("api_key") ||
-    msg.includes("invalid key") ||
-    msg.includes("authentication")
+    /\b40[13]\b|api key|api_key|invalid key|authentication|unauthenticated|permission/.test(
+      msg,
+    )
   )
     return "auth_error";
-  if (msg.includes("json") || msg.includes("parse") || msg.includes("syntax"))
-    return "json_parse_error";
-  if (msg.includes("validation") || msg.includes("zod"))
-    return "validation_error";
-  if (
-    msg.includes("network") ||
-    msg.includes("econnrefused") ||
-    msg.includes("fetch")
-  )
-    return "network_error";
-  return `ai_error: ${(err?.message || "").slice(0, 80)}`;
+  if (/\b404\b|not found|no longer available|not supported/.test(msg))
+    return "model_error";
+  if (/json|parse|syntax/.test(msg)) return "json_parse_error";
+  if (/validation|zod/.test(msg)) return "validation_error";
+  if (/network|econnrefused|fetch/.test(msg)) return "network_error";
+  return `ai_error: ${msg.slice(0, 80)}`;
 }
 
 /** Sleep for ms milliseconds */
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Call Gemini with one automatic retry on 429 (exponential backoff) */
+/** Call the provider with automatic retries on rate limits (exponential backoff) */
 async function callWithRetry(
   prompt: string,
   schema: string,
@@ -71,12 +85,12 @@ async function callWithRetry(
 ): Promise<string> {
   try {
     return await callLLMProvider(prompt, schema, config);
-  } catch (err: any) {
+  } catch (err: unknown) {
     const reason = diagnose(err);
     if (reason === "rate_limited" && attempt < 2) {
       const wait = 1500 * Math.pow(2, attempt); // 1.5s → 3s
       console.warn(
-        `[CelebrAI] Rate limited on attempt ${attempt + 1}, retrying in ${wait}ms…`,
+        `[CelebrAI] Rate limited on attempt ${attempt + 1}, retrying in ${wait}ms`,
       );
       await sleep(wait);
       return callWithRetry(prompt, schema, config, attempt + 1);
@@ -92,41 +106,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .json({ success: false, error: "Method not allowed" });
   }
 
-  const clientIp =
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
-    req.socket?.remoteAddress ||
-    "127.0.0.1";
-
-  if (!checkRateLimit(clientIp)) {
-    const failReason = "rate_limited (server-side per-IP cap)";
-    console.warn(`[CelebrAI] IP rate limit hit: ${clientIp}`);
-    return res.status(200).json({
-      success: true,
-      isDemo: true,
-      failReason,
-      data: generateLocalSectionData(req.body?.section, req.body?.input),
-      notice: failReason,
-    });
-  }
-
   try {
-    const { section, input } = req.body ?? {};
+    const { section, input } = (req.body ?? {}) as {
+      section?: unknown;
+      input?: unknown;
+    };
 
-    if (!section || !input) {
+    if (!isSectionKey(section) || !input) {
       return res
         .status(400)
-        .json({ success: false, error: "Missing section or input" });
+        .json({ success: false, error: "Missing or invalid section or input" });
     }
 
     const parsedInput = eventFormSchema.safeParse(input);
     if (!parsedInput.success) {
       const msg =
         parsedInput.error.errors[0]?.message ?? "Input validation failed";
-      console.error(
-        "[CelebrAI] Input validation failed:",
-        parsedInput.error.errors,
-      );
+      console.error("[CelebrAI] Input validation failed:", msg);
       return res.status(400).json({ success: false, error: msg });
+    }
+    const evt = parsedInput.data;
+
+    const clientIp =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket?.remoteAddress ||
+      "127.0.0.1";
+
+    if (!checkRateLimit(clientIp)) {
+      const failReason = "rate_limited (server-side per-IP cap)";
+      console.warn(`[CelebrAI] IP rate limit hit: ${clientIp}`);
+      return res.status(200).json({
+        success: true,
+        isDemo: true,
+        failReason,
+        data: generateLocalSectionData(section, evt),
+        notice: failReason,
+      });
     }
 
     const provider = (
@@ -141,10 +156,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       process.env.OPENAI_API_KEY,
     );
 
-    console.log(
-      `[CelebrAI] section=${section} provider=${provider} hasKey=${hasKey}`,
-    );
-
     if (!hasKey) {
       const failReason = "no_api_key: set GEMINI_API_KEY in Vercel env vars";
       console.warn("[CelebrAI] No API key configured.");
@@ -152,12 +163,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         success: true,
         isDemo: true,
         failReason,
-        data: generateLocalSectionData(section, parsedInput.data),
+        data: generateLocalSectionData(section, evt),
         notice: failReason,
       });
     }
 
-    const evt = parsedInput.data;
     const prompt = buildPrompt(section, evt);
     const schema = getSectionSchema(section, evt);
 
@@ -165,58 +175,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const rawOutput = await callWithRetry(prompt, schema, { provider });
       const cleaned = stripFences(rawOutput);
 
-      console.log(
-        `[CelebrAI] ${section} raw (first 300):`,
-        cleaned.slice(0, 300),
-      );
-
-      let json: any;
+      let parsedData: unknown;
       try {
-        json = JSON.parse(cleaned);
-      } catch (parseErr: any) {
-        const failReason = `json_parse_error: ${parseErr?.message?.slice(0, 60)}`;
-        console.error(
-          `[CelebrAI] ${section} JSON parse failed:`,
-          parseErr,
-          "\nRaw:",
-          cleaned.slice(0, 400),
-        );
+        parsedData = JSON.parse(cleaned);
+      } catch (parseErr: unknown) {
+        const failReason = `json_parse_error: ${getErrorMessage(parseErr).slice(0, 60)}`;
+        console.error(`[CelebrAI] ${section} ${failReason}`);
         return res.status(200).json({
           success: true,
           isDemo: true,
           failReason,
-          data: generateLocalSectionData(section, parsedInput.data),
+          data: generateLocalSectionData(section, evt),
           notice: failReason,
         });
       }
 
       // Success — return live AI data
-      return res.status(200).json({ success: true, isDemo: false, data: json });
-    } catch (llmErr: any) {
+      return res
+        .status(200)
+        .json({ success: true, isDemo: false, data: parsedData });
+    } catch (llmErr: unknown) {
       const failReason = diagnose(llmErr);
       console.error(
         `[CelebrAI] ${section} LLM error (${failReason}):`,
-        llmErr?.message,
+        getErrorMessage(llmErr),
       );
       return res.status(200).json({
         success: true,
         isDemo: true,
         failReason,
-        data: generateLocalSectionData(section, parsedInput.data),
+        data: generateLocalSectionData(section, evt),
         notice: `${section}: ${failReason}`,
       });
     }
-  } catch (err: any) {
-    console.error("[CelebrAI] Unexpected handler error:", err?.message);
+  } catch (err: unknown) {
+    const errorMsg = getErrorMessage(err);
+    console.error("[CelebrAI] Unexpected handler error:", errorMsg);
     return res
       .status(500)
-      .json({ success: false, error: err.message || "Internal server error" });
+      .json({ success: false, error: errorMsg || "Internal server error" });
   }
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildPrompt(section: string, evt: any): string {
+function buildPrompt(section: string, evt: EventFormData): string {
   return `Generate the "${section}" section for this event:
 Type: ${evt.eventType}
 Name: ${evt.name}
@@ -231,7 +234,7 @@ Cultural preferences: ${evt.culturalPreferences || "None"}
 Special requests: ${evt.specialRequests || "None"}`;
 }
 
-function getSectionSchema(section: string, evt: any): string {
+function getSectionSchema(section: string, evt: EventFormData): string {
   switch (section) {
     case "concept":
       return `{
