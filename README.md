@@ -2,14 +2,15 @@
 
 > Built for **PromptWars Virtual, Challenge 5: Celebration & Event Planner**
 
-🌐 **Live app:** https://fete-pink.vercel.app/
+🌐 **Live app:** [https://fete-pink.vercel.app/](https://fete-bsot0luc9-meeee-abcc.vercel.app/)
 🎥 **Demo video:** https://youtu.be/bPFy4jb50o0
 
 ![CelebrAI budget tab](./docs/budget-tab.png)
 
 CelebrAI turns one event idea (a wedding, birthday, college fest or community gathering) into a complete, editable plan: personalized ideas, a budget, a timeline, a vendor checklist, a guest tracker and ready-to-send invitations.
 
----
+---Attach files by dragging & dropping, selecting or pasting them.
+
 
 ## 1. Problem
 
@@ -97,7 +98,7 @@ Section A   Section B   Section C   Section D    │
 | Validation | Zod |
 | Sharing | lz-string |
 | Backend | Vercel serverless functions (`/api/generate-plan`, `/api/chat`) |
-| GenAI | Google Gemini by default; provider adapter also supports Anthropic and OpenAI (model: [FILL IN FROM providerAdapter.ts]) |
+| GenAI | Google Gemini by default; provider adapter also supports Anthropic and OpenAI (model: gemini-3.5-flash) |
 | Testing | Vitest |
 | Hosting | Vercel |
 
