@@ -4,6 +4,7 @@
     "api/generate-plan.ts": {
       "maxDuration": 30
     },
+       "functions": { "api/generate-plan.ts": { "maxDuration": 30 },
     "api/chat.ts": {
       "maxDuration": 20
     }

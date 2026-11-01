@@ -1,4 +1,4 @@
-import {
+import type {
   EventFormInput,
   SectionKey,
   EventPlan,
@@ -9,15 +9,28 @@ import {
   WeatherPlanB,
   ConceptData,
 } from "../../types";
-import { callSectionAI, generateLocalSectionData } from "./providerAdapter";
-import { rescaleBudgetLines, computeTimelineDates } from "../math";
+import {
+  callSectionAIStrict,
+  generateLocalSectionData,
+} from "./providerAdapter.js";
+import { rescaleBudgetLines, computeTimelineDates } from "../math.js";
 
 export interface ParallelPlanCallbacks {
   onSectionStart: (section: SectionKey) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSectionSuccess: (section: SectionKey, data: any, isDemo: boolean) => void;
   onSectionError: (section: SectionKey, error: string) => void;
 }
 
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+/**
+ * Requests one section from the AI. If the first attempt fails, tries once more.
+ * If both fail, that section alone falls back to the local sample generator,
+ * so the other sections can still be live AI.
+ */
 export async function fetchSectionWithSingleRetry<T>(
   section: SectionKey,
   input: EventFormInput,
@@ -26,17 +39,23 @@ export async function fetchSectionWithSingleRetry<T>(
   callbacks.onSectionStart(section);
 
   try {
-    const result = await callSectionAI<T>(section, input);
+    const result = await callSectionAIStrict<T>(section, input);
     callbacks.onSectionSuccess(section, result.data, result.isDemo);
     return result;
-  } catch (err: any) {
-    // Retry once automatically
+  } catch (firstErr: unknown) {
+    console.warn(
+      `[CelebrAI] "${section}" failed, retrying once: ${errorMessage(firstErr)}`,
+    );
     try {
-      const retryResult = await callSectionAI<T>(section, input);
+      const retryResult = await callSectionAIStrict<T>(section, input);
       callbacks.onSectionSuccess(section, retryResult.data, retryResult.isDemo);
       return retryResult;
-    } catch (retryErr: any) {
-      // Fallback to safe local generator rather than showing broken state
+    } catch (retryErr: unknown) {
+      const reason = errorMessage(retryErr);
+      console.warn(
+        `[CelebrAI] "${section}" fell back to sample data: ${reason}`,
+      );
+      // Fall back to the safe local generator rather than showing a broken state.
       const fallbackData = generateLocalSectionData(section, input);
       callbacks.onSectionSuccess(section, fallbackData, true);
       return { data: fallbackData as T, isDemo: true };
@@ -48,32 +67,30 @@ export async function generateFullParallelPlan(
   input: EventFormInput,
   callbacks: ParallelPlanCallbacks,
 ): Promise<EventPlan> {
-  let isAnyDemo = false;
-
   // Execute all 4 sections in parallel
   const [conceptRes, budgetRes, timelineRes, vendorRes] = await Promise.all([
     fetchSectionWithSingleRetry<ConceptData>("concept", input, callbacks),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fetchSectionWithSingleRetry<{ lines: any[] }>("budget", input, callbacks),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fetchSectionWithSingleRetry<{ tasks: any[]; daySchedule: any[] }>(
       "timeline",
       input,
       callbacks,
     ),
     fetchSectionWithSingleRetry<{
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vendors: any[];
       expertTips: string[];
       weatherPlanB: WeatherPlanB;
     }>("vendors", input, callbacks),
   ]);
 
-  if (
+  const isAnyDemo =
     conceptRes.isDemo ||
     budgetRes.isDemo ||
     timelineRes.isDemo ||
-    vendorRes.isDemo
-  ) {
-    isAnyDemo = true;
-  }
+    vendorRes.isDemo;
 
   // Code owns the math
   const budgetSummary: BudgetSummary = rescaleBudgetLines(
@@ -87,6 +104,7 @@ export async function generateFullParallelPlan(
 
   const daySchedule: EventDayScheduleItem[] = (
     timelineRes.data.daySchedule || []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ).map((item: any, idx: number) => ({
     id: item.id || `sched-${idx}-${Date.now()}`,
     time: item.time || "10:00 AM",
@@ -96,6 +114,7 @@ export async function generateFullParallelPlan(
   }));
 
   const vendors: VendorItem[] = (vendorRes.data.vendors || []).map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (v: any, idx: number) => ({
       id: `v-${idx}-${Date.now()}`,
       serviceType: v.serviceType || "Vendor Service",

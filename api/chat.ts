@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { callLLMProvider } from "../src/lib/ai/providerAdapter";
+import { callLLMProvider } from "../src/lib/ai/providerAdapter.js";
 
 const CHAT_SYSTEM_PROMPT = `You are EventCraft AI, an expert event planning assistant with deep knowledge of weddings, birthdays, anniversaries, college fests, and community events. You have full context of the user's event plan. 
 
@@ -166,7 +166,7 @@ EVENT CONTEXT:
       const rawOutput = await callLLMProvider(userPrompt, CHAT_SYSTEM_PROMPT, {
         provider,
         isChat: true,
-      } as any);
+      });
 
       const cleaned = stripFences(rawOutput);
       let parsed: any;

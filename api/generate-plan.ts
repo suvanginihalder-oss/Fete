@@ -1,7 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { callLLMProvider } from "../src/lib/ai/providerAdapter";
-import { generateLocalSectionData } from "../src/lib/ai/providerAdapter";
-import { eventFormSchema } from "../src/lib/schemas";
+import {
+  callLLMProvider,
+  generateLocalSectionData,
+} from "../src/lib/ai/providerAdapter.js";
+import { eventFormSchema } from "../src/lib/schemas.js";
 
 // In-memory rate limiting: max 30 req / minute per IP
 const ipRateMap = new Map<string, { count: number; expiresAt: number }>();
@@ -157,7 +159,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const evt = parsedInput.data;
     const prompt = buildPrompt(section, evt);
-    const schema = getSectionSchema(section);
+    const schema = getSectionSchema(section, evt);
 
     try {
       const rawOutput = await callWithRetry(prompt, schema, { provider });
@@ -229,7 +231,7 @@ Cultural preferences: ${evt.culturalPreferences || "None"}
 Special requests: ${evt.specialRequests || "None"}`;
 }
 
-function getSectionSchema(section: string): string {
+function getSectionSchema(section: string, evt: any): string {
   switch (section) {
     case "concept":
       return `{
@@ -255,7 +257,7 @@ function getSectionSchema(section: string): string {
     }
   ]
 }
-CRITICAL: allocatedAmount values must be integers. All allocatedAmount values must sum exactly to the total budget of ${0}.`;
+CRITICAL: allocatedAmount values must be integers. All allocatedAmount values must sum exactly to the total budget of ${evt.budget}.`;
 
     case "timeline":
       return `{
