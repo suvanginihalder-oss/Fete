@@ -101,11 +101,11 @@ export function importPlansFromJSON(jsonText: string): {
     }
 
     return { success: true, count: plansArray.length };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
       count: 0,
-      error: err.message || "Corrupted JSON file",
+      error: err instanceof Error ? err.message : "Corrupted JSON file",
     };
   }
 }
