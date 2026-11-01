@@ -61,7 +61,9 @@ describe("generateDemoConcept", () => {
   it("includes dietary choices, or a default when none are selected", () => {
     const withDiet = generateDemoConcept(makeInput());
     expect(withDiet.food.description).toContain("Pure Veg, Jain Option");
-    expect(withDiet.food.dietaryAccommodations).toContain("Pure Veg, Jain Option");
+    expect(withDiet.food.dietaryAccommodations).toContain(
+      "Pure Veg, Jain Option",
+    );
 
     const noDiet = generateDemoConcept(makeInput({ dietary: [] }));
     expect(noDiet.food.description).toContain("Standard accommodating");
@@ -101,14 +103,16 @@ describe("generateDemoBudgetLines", () => {
     const lines = generateDemoBudgetLines(makeInput());
     expect(lines.length).toBe(6);
     expect(lines.every((l) => l.actualAmount === 0)).toBe(true);
-    expect(lines.some((l) => l.category === "Emergency Buffer & Contingency")).toBe(
-      true,
-    );
+    expect(
+      lines.some((l) => l.category === "Emergency Buffer & Contingency"),
+    ).toBe(true);
   });
 
   it("gives weddings a larger venue share than other events", () => {
     const other = generateDemoBudgetLines(makeInput({ eventType: "birthday" }));
-    const wedding = generateDemoBudgetLines(makeInput({ eventType: "wedding" }));
+    const wedding = generateDemoBudgetLines(
+      makeInput({ eventType: "wedding" }),
+    );
     expect(other[0]?.allocatedAmount).toBe(25000);
     expect(wedding[0]?.allocatedAmount).toBe(30000);
     expect(other[1]?.allocatedAmount).toBe(35000);

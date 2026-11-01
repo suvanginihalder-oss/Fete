@@ -5,11 +5,8 @@ import {
   Calendar,
   DollarSign,
   Users,
-  CheckSquare,
   Briefcase,
   MessageSquare,
-  LayoutDashboard,
-  ShieldAlert,
 } from "lucide-react";
 
 import {
@@ -53,12 +50,25 @@ import { ChatAssistantDrawer } from "./components/ChatAssistantDrawer";
 import { SavedPlansDrawer } from "./components/SavedPlansDrawer";
 import { Toast } from "./components/Toast";
 
+type TabKey = "concept" | "budget" | "timeline" | "vendors" | "guests" | "invites";
+
+const TAB_ORDER: TabKey[] = [
+  "concept",
+  "budget",
+  "timeline",
+  "vendors",
+  "guests",
+  "invites",
+];
+
+/**
+ * Main application component coordinating navigation, AI plan generation,
+ * state persistence, and accessible tab views.
+ */
 export function App() {
   const [plans, setPlans] = useState<EventPlan[]>([]);
   const [activePlan, setActivePlan] = useState<EventPlan | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "concept" | "budget" | "timeline" | "vendors" | "guests" | "invites"
-  >("concept");
+  const [activeTab, setActiveTab] = useState<TabKey>("concept");
 
   // Modals & Drawers
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -115,6 +125,9 @@ export function App() {
     setToastMessage(msg);
   };
 
+  /**
+   * Fires confetti with reduced motion fallback for accessibility compliance.
+   */
   const fireCelebration = () => {
     try {
       confetti({
@@ -122,13 +135,14 @@ export function App() {
         spread: 60,
         origin: { y: 0.6 },
         colors: ["#4A154B", "#FF6B6B", "#F59E0B", "#10B981"],
+        disableForReducedMotion: true,
       });
-    } catch (e) {
-      // safe fallback
+    } catch {
+      // Safe fallback if canvas is unsupported
     }
   };
 
-  // Load College Cultural Fest Sample (Phase 1 Seed Requirement)
+  // Load College Cultural Fest Sample
   const handleLoadSample = () => {
     const sample = createSampleCollegeFest();
     savePlanToStorage(sample);
@@ -196,7 +210,7 @@ export function App() {
       setIsReadOnly(false);
       fireCelebration();
       showToast(`Blueprint generated for "${fullPlan.input.name}"!`);
-    } catch (err: any) {
+    } catch {
       setIsGenerating(false);
       showToast("Plan generation experienced an issue; loading sample plan");
       handleLoadSample();
@@ -213,7 +227,7 @@ export function App() {
 
     try {
       await fetchSectionWithSingleRetry(section, activePlan.input, {
-        onSectionStart: () => {},
+        onSectionStart: () => { },
         onSectionSuccess: () => {
           setSectionStates((prev) => ({
             ...prev,
@@ -233,7 +247,7 @@ export function App() {
           }));
         },
       });
-    } catch (e) {
+    } catch {
       showToast("Section retry completed");
     }
   };
@@ -303,8 +317,40 @@ export function App() {
     showToast("Event deleted");
   };
 
+  /**
+   * Accessible roving keyboard navigation for tabs (WCAG 2.1 AA)
+   */
+  const handleTabKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number
+  ) => {
+    let nextIndex = currentIndex;
+    if (e.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % TAB_ORDER.length;
+    } else if (e.key === "ArrowLeft") {
+      nextIndex = (currentIndex - 1 + TAB_ORDER.length) % TAB_ORDER.length;
+    } else if (e.key === "Home") {
+      nextIndex = 0;
+    } else if (e.key === "End") {
+      nextIndex = TAB_ORDER.length - 1;
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+    const nextTab = TAB_ORDER[nextIndex];
+    setActiveTab(nextTab);
+    const nextElement = document.getElementById(`tab-${nextTab}`);
+    nextElement?.focus();
+  };
+
   return (
     <div className="min-h-screen bg-ivory-100 flex flex-col font-sans">
+      {/* Accessible Skip Link */}
+      <a href="#main" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Navigation */}
       <Navbar
         activePlan={activePlan}
@@ -316,8 +362,8 @@ export function App() {
         isReadOnly={isReadOnly}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 pb-16">
+      {/* Main Landmark Container */}
+      <main id="main" tabIndex={-1} className="flex-1 pb-16 outline-none">
         {activePlan ? (
           <div>
             {/* Header with Title & Action toolbar */}
@@ -331,93 +377,136 @@ export function App() {
               isReadOnly={isReadOnly}
             />
 
-            {/* Tab Navigation Pill Bar */}
+            {/* Tab Navigation Pill Bar with Full ARIA tablist */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-              <div className="flex items-center gap-1.5 p-1.5 bg-ivory-200/80 backdrop-blur-xs rounded-2xl border border-ivory-300 overflow-x-auto">
+              <div
+                role="tablist"
+                aria-label="Event blueprint sections"
+                className="flex items-center gap-1.5 p-1.5 bg-ivory-200/80 backdrop-blur-xs rounded-2xl border border-ivory-300 overflow-x-auto"
+              >
                 <button
+                  id="tab-concept"
+                  role="tab"
+                  aria-selected={activeTab === "concept"}
+                  aria-controls="panel-concept"
+                  tabIndex={activeTab === "concept" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 0)}
                   onClick={() => setActiveTab("concept")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "concept"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "concept"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <Sparkles className="w-4 h-4 text-coral-400" />
+                  <Sparkles className="w-4 h-4 text-coral-400" aria-hidden="true" />
                   <span>Concept & Theme</span>
                 </button>
 
                 <button
+                  id="tab-budget"
+                  role="tab"
+                  aria-selected={activeTab === "budget"}
+                  aria-controls="panel-budget"
+                  tabIndex={activeTab === "budget" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 1)}
                   onClick={() => setActiveTab("budget")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "budget"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "budget"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <DollarSign className="w-4 h-4 text-emerald-400" />
+                  <DollarSign className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                   <span>Budget & What-If</span>
                   {activePlan.budget.isOverBudget && (
-                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-rose-500" aria-hidden="true" />
+                      <span className="sr-only">(Budget exceeded warning)</span>
+                    </>
                   )}
                 </button>
 
                 <button
+                  id="tab-timeline"
+                  role="tab"
+                  aria-selected={activeTab === "timeline"}
+                  aria-controls="panel-timeline"
+                  tabIndex={activeTab === "timeline" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 2)}
                   onClick={() => setActiveTab("timeline")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "timeline"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "timeline"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <Calendar className="w-4 h-4 text-purple-400" />
+                  <Calendar className="w-4 h-4 text-purple-400" aria-hidden="true" />
                   <span>Timeline & Schedule</span>
                 </button>
 
                 <button
+                  id="tab-vendors"
+                  role="tab"
+                  aria-selected={activeTab === "vendors"}
+                  aria-controls="panel-vendors"
+                  tabIndex={activeTab === "vendors" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 3)}
                   onClick={() => setActiveTab("vendors")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "vendors"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "vendors"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <Briefcase className="w-4 h-4 text-amber-400" />
+                  <Briefcase className="w-4 h-4 text-amber-400" aria-hidden="true" />
                   <span>Vendors & Plan B</span>
                 </button>
 
                 <button
+                  id="tab-guests"
+                  role="tab"
+                  aria-selected={activeTab === "guests"}
+                  aria-controls="panel-guests"
+                  tabIndex={activeTab === "guests" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 4)}
                   onClick={() => setActiveTab("guests")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "guests"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "guests"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <Users className="w-4 h-4 text-blue-400" />
+                  <Users className="w-4 h-4 text-blue-400" aria-hidden="true" />
                   <span>RSVP & Guests ({activePlan.guests.length})</span>
                 </button>
 
                 <button
+                  id="tab-invites"
+                  role="tab"
+                  aria-selected={activeTab === "invites"}
+                  aria-controls="panel-invites"
+                  tabIndex={activeTab === "invites" ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, 5)}
                   onClick={() => setActiveTab("invites")}
                   type="button"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
-                    activeTab === "invites"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 focus-visible:outline-none ${activeTab === "invites"
                       ? "bg-plum-900 text-white shadow-soft"
                       : "text-stone-700 hover:text-plum-950 hover:bg-ivory-300/60"
-                  }`}
+                    }`}
                 >
-                  <MessageSquare className="w-4 h-4 text-coral-400" />
+                  <MessageSquare className="w-4 h-4 text-coral-400" aria-hidden="true" />
                   <span>Invites & Sharing</span>
                 </button>
               </div>
 
-              {/* Active Tab Panel */}
-              <div className="mt-8">
+              {/* Active Tab Panel with Landmark & Labelledby */}
+              <div
+                role="tabpanel"
+                id={`panel-${activeTab}`}
+                aria-labelledby={`tab-${activeTab}`}
+                tabIndex={0}
+                className="mt-8 focus:outline-none"
+              >
                 {activeTab === "concept" && (
                   <ConceptTab
                     concept={activePlan.concept}
@@ -531,7 +620,7 @@ export function App() {
         onLoadSample={handleLoadSample}
       />
 
-      {/* Toast Notification */}
+      {/* Accessible Toast Notification */}
       <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </div>
   );

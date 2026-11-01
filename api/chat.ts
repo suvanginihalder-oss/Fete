@@ -223,7 +223,9 @@ EVENT CONTEXT:
         reply = { reply: cleaned || rawOutput, suggestedAction: null };
       }
 
-      return res.status(200).json({ success: true, isDemo: false, data: reply });
+      return res
+        .status(200)
+        .json({ success: true, isDemo: false, data: reply });
     } catch (llmErr: unknown) {
       console.error("[CelebrAI/chat] LLM error:", getErrorMessage(llmErr));
       return res.status(200).json({

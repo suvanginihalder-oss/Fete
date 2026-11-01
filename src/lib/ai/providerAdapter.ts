@@ -195,11 +195,15 @@ export async function callLLMProvider(
       }
 
       const errText = await res.text();
-      lastError = new Error(`Gemini API error ${res.status} (${model}): ${errText}`);
+      lastError = new Error(
+        `Gemini API error ${res.status} (${model}): ${errText}`,
+      );
 
       // Out of quota, model retired, or temporarily overloaded: try the next model.
       if (res.status === 429 || res.status === 404 || res.status === 503) {
-        console.warn(`[CelebrAI] ${model} unavailable (HTTP ${res.status}), trying next model`);
+        console.warn(
+          `[CelebrAI] ${model} unavailable (HTTP ${res.status}), trying next model`,
+        );
         continue;
       }
       throw lastError;

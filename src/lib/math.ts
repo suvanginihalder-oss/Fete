@@ -270,8 +270,7 @@ export function calculateGuestMetrics(
   );
 
   const totalHeadcount = confirmedHeadcount + pendingHeadcount;
-  const effectiveGuests =
-    Math.max(confirmedHeadcount, expectedGuests);
+  const effectiveGuests = Math.max(confirmedHeadcount, expectedGuests);
   const perHeadCost =
     totalBudget > 0 && effectiveGuests > 0
       ? Math.round(totalBudget / effectiveGuests)

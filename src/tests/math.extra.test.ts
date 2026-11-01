@@ -97,9 +97,9 @@ describe("rescaleBudgetLines", () => {
     expect(result.isOverBudget).toBe(true);
     expect(result.overBudgetAmount).toBe(100);
     expect(result.remainingBudget).toBe(0);
-    expect(result.warnings.some((w) => w.includes("exceeds budget by 100"))).toBe(
-      true,
-    );
+    expect(
+      result.warnings.some((w) => w.includes("exceeds budget by 100")),
+    ).toBe(true);
   });
 
   it("reports the remaining budget when spending is under the total", () => {
@@ -133,16 +133,21 @@ describe("rescaleBudgetLines", () => {
       ],
       1000,
     );
-    expect(withBuffer.warnings.some((w) => w.includes("emergency buffer"))).toBe(
-      false,
-    );
+    expect(
+      withBuffer.warnings.some((w) => w.includes("emergency buffer")),
+    ).toBe(false);
   });
 
   it("fills in defaults for missing fields and keeps provided ones", () => {
     const result = rescaleBudgetLines(
       [
         { allocatedAmount: 1 },
-        { id: "keep-me", category: "Food", potentialSavings: 0, allocatedAmount: 1 },
+        {
+          id: "keep-me",
+          category: "Food",
+          potentialSavings: 0,
+          allocatedAmount: 1,
+        },
       ],
       1000,
     );
@@ -248,7 +253,10 @@ describe("calculateProgress", () => {
   });
 
   it("reports 100% when every task is complete", () => {
-    const result = calculateProgress([{ completed: true }, { completed: true }]);
+    const result = calculateProgress([
+      { completed: true },
+      { completed: true },
+    ]);
     expect(result.percentage).toBe(100);
   });
 });

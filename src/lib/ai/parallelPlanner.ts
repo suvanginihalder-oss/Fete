@@ -104,14 +104,15 @@ export async function generateFullParallelPlan(
 
   const daySchedule: EventDayScheduleItem[] = (
     timelineRes.data.daySchedule || []
+  )
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ).map((item: any, idx: number) => ({
-    id: item.id || `sched-${idx}-${Date.now()}`,
-    time: item.time || "10:00 AM",
-    activity: item.activity || "Activity",
-    owner: item.owner || "Host",
-    notes: item.notes || "",
-  }));
+    .map((item: any, idx: number) => ({
+      id: item.id || `sched-${idx}-${Date.now()}`,
+      time: item.time || "10:00 AM",
+      activity: item.activity || "Activity",
+      owner: item.owner || "Host",
+      notes: item.notes || "",
+    }));
 
   const vendors: VendorItem[] = (vendorRes.data.vendors || []).map(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

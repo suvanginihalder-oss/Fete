@@ -87,7 +87,10 @@ describe("eventFormSchema", () => {
   });
 
   it("rejects past dates and badly formatted dates", () => {
-    const past = eventFormSchema.safeParse({ ...validForm(), date: "2020-01-01" });
+    const past = eventFormSchema.safeParse({
+      ...validForm(),
+      date: "2020-01-01",
+    });
     expect(messageFor(past, "date")).toBe(
       "Event date must be in the future (or today)",
     );
@@ -107,9 +110,9 @@ describe("eventFormSchema", () => {
   });
 
   it("rejects invalid guest counts", () => {
-    expect(eventFormSchema.safeParse({ ...validForm(), guests: 0 }).success).toBe(
-      false,
-    );
+    expect(
+      eventFormSchema.safeParse({ ...validForm(), guests: 0 }).success,
+    ).toBe(false);
     expect(
       eventFormSchema.safeParse({ ...validForm(), guests: 1.5 }).success,
     ).toBe(false);
@@ -178,12 +181,12 @@ describe("concept schemas", () => {
   });
 
   it("coerces numeric strings and falls back for out-of-range values", () => {
-    expect(decorIdeaSchema.parse({ estCostSharePercent: "25" }).estCostSharePercent).toBe(
-      25,
-    );
-    expect(decorIdeaSchema.parse({ estCostSharePercent: 500 }).estCostSharePercent).toBe(
-      10,
-    );
+    expect(
+      decorIdeaSchema.parse({ estCostSharePercent: "25" }).estCostSharePercent,
+    ).toBe(25);
+    expect(
+      decorIdeaSchema.parse({ estCostSharePercent: 500 }).estCostSharePercent,
+    ).toBe(10);
     expect(decorIdeaSchema.parse({}).title).toBe("Decoration Idea");
   });
 });
@@ -192,16 +195,18 @@ describe("concept schemas", () => {
 
 describe("budget schemas", () => {
   it("coerces numeric strings for allocated amounts", () => {
-    expect(rawBudgetLineSchema.parse({ allocatedAmount: "1500" }).allocatedAmount).toBe(
-      1500,
-    );
+    expect(
+      rawBudgetLineSchema.parse({ allocatedAmount: "1500" }).allocatedAmount,
+    ).toBe(1500);
   });
 
   it("falls back to zero for invalid or negative amounts", () => {
-    expect(rawBudgetLineSchema.parse({ allocatedAmount: "abc" }).allocatedAmount).toBe(
-      0,
-    );
-    expect(rawBudgetLineSchema.parse({ allocatedAmount: -5 }).allocatedAmount).toBe(0);
+    expect(
+      rawBudgetLineSchema.parse({ allocatedAmount: "abc" }).allocatedAmount,
+    ).toBe(0);
+    expect(
+      rawBudgetLineSchema.parse({ allocatedAmount: -5 }).allocatedAmount,
+    ).toBe(0);
     expect(rawBudgetLineSchema.parse({}).allocatedAmount).toBe(0);
   });
 
@@ -236,17 +241,21 @@ describe("budget schemas", () => {
 
 describe("timeline schemas", () => {
   it("coerces offsets and rejects non-integers", () => {
-    expect(rawTimelineTaskSchema.parse({ dueOffsetDays: "-30" }).dueOffsetDays).toBe(
-      -30,
-    );
-    expect(rawTimelineTaskSchema.parse({ dueOffsetDays: 5.5 }).dueOffsetDays).toBe(-7);
+    expect(
+      rawTimelineTaskSchema.parse({ dueOffsetDays: "-30" }).dueOffsetDays,
+    ).toBe(-30);
+    expect(
+      rawTimelineTaskSchema.parse({ dueOffsetDays: 5.5 }).dueOffsetDays,
+    ).toBe(-7);
   });
 
   it("defaults an unknown priority to medium", () => {
     expect(rawTimelineTaskSchema.parse({ priority: "urgent" }).priority).toBe(
       "medium",
     );
-    expect(rawTimelineTaskSchema.parse({ priority: "high" }).priority).toBe("high");
+    expect(rawTimelineTaskSchema.parse({ priority: "high" }).priority).toBe(
+      "high",
+    );
   });
 
   it("applies defaults to an empty task and an empty schedule item", () => {
@@ -288,7 +297,9 @@ describe("vendor schemas", () => {
     expect(parsed.weatherPlanB.riskAssessment).toBe(
       "Standard seasonal weather risk.",
     );
-    expect(parsed.weatherPlanB.backupVenuesOrGear).toEqual(["Indoor banquet hall"]);
+    expect(parsed.weatherPlanB.backupVenuesOrGear).toEqual([
+      "Indoor banquet hall",
+    ]);
   });
 
   it("keeps valid vendors", () => {
@@ -302,6 +313,8 @@ describe("vendor schemas", () => {
       ],
     });
     expect(parsed.vendors[0]?.serviceType).toBe("Catering");
-    expect(parsed.vendors[0]?.questionsToAsk).toEqual(["Do you handle Jain meals?"]);
+    expect(parsed.vendors[0]?.questionsToAsk).toEqual([
+      "Do you handle Jain meals?",
+    ]);
   });
 });

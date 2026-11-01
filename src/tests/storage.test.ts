@@ -202,12 +202,18 @@ describe("checkRateQuota", () => {
   });
 
   it("blocks requests once the daily limit is reached", () => {
-    memory.setItem(RATE_LIMIT_KEY, JSON.stringify({ date: today(), count: 200 }));
+    memory.setItem(
+      RATE_LIMIT_KEY,
+      JSON.stringify({ date: today(), count: 200 }),
+    );
     expect(checkRateQuota()).toEqual({ allowed: false, remaining: 0 });
   });
 
   it("allows the last request and then blocks the next one", () => {
-    memory.setItem(RATE_LIMIT_KEY, JSON.stringify({ date: today(), count: 199 }));
+    memory.setItem(
+      RATE_LIMIT_KEY,
+      JSON.stringify({ date: today(), count: 199 }),
+    );
     expect(checkRateQuota()).toEqual({ allowed: true, remaining: 0 });
     expect(checkRateQuota().allowed).toBe(false);
   });

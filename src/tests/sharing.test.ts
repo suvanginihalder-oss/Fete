@@ -59,7 +59,10 @@ describe("encodePlanToUrl and decodePlanFromUrl", () => {
   });
 
   it("round-trips text with emoji and special characters", () => {
-    const plan = makePlan({ name: "Priya & Rahul's 🎉 Sangeet", city: "Chennai" });
+    const plan = makePlan({
+      name: "Priya & Rahul's 🎉 Sangeet",
+      city: "Chennai",
+    });
     const url = encodePlanToUrl(plan);
     const shared = new URL(url).searchParams.get("share") as string;
     expect(decodePlanFromUrl(shared)).toEqual(plan);
@@ -113,23 +116,41 @@ describe("generateInvitationText", () => {
 
   it("writes a different message for each tone", () => {
     const tones: InvitationTone[] = ["formal", "casual", "poetic", "funky"];
-    const texts = new Set(tones.map((t) => generateInvitationText(makePlan(), t)));
+    const texts = new Set(
+      tones.map((t) => generateInvitationText(makePlan(), t)),
+    );
     expect(texts.size).toBe(4);
   });
 
   it("uses a recognizable opening for each tone", () => {
-    expect(generateInvitationText(makePlan(), "formal")).toContain("Honored Guests");
-    expect(generateInvitationText(makePlan(), "casual")).toContain("Hey everyone!");
-    expect(generateInvitationText(makePlan(), "poetic")).toContain("Join us under glowing lights");
-    expect(generateInvitationText(makePlan(), "funky")).toContain("IT'S CELEBRATION TIME!");
+    expect(generateInvitationText(makePlan(), "formal")).toContain(
+      "Honored Guests",
+    );
+    expect(generateInvitationText(makePlan(), "casual")).toContain(
+      "Hey everyone!",
+    );
+    expect(generateInvitationText(makePlan(), "poetic")).toContain(
+      "Join us under glowing lights",
+    );
+    expect(generateInvitationText(makePlan(), "funky")).toContain(
+      "IT'S CELEBRATION TIME!",
+    );
   });
 
   it("uses a fallback theme line when no theme is set", () => {
     const plan = makePlan({ theme: "" });
-    expect(generateInvitationText(plan, "formal")).toContain("Celebratory Attire");
-    expect(generateInvitationText(plan, "casual")).toContain("Come as you are & festive");
-    expect(generateInvitationText(plan, "poetic")).toContain("Festive Radiance");
-    expect(generateInvitationText(plan, "funky")).toContain("Ultra Cool & Vibrant");
+    expect(generateInvitationText(plan, "formal")).toContain(
+      "Celebratory Attire",
+    );
+    expect(generateInvitationText(plan, "casual")).toContain(
+      "Come as you are & festive",
+    );
+    expect(generateInvitationText(plan, "poetic")).toContain(
+      "Festive Radiance",
+    );
+    expect(generateInvitationText(plan, "funky")).toContain(
+      "Ultra Cool & Vibrant",
+    );
   });
 });
 
@@ -154,6 +175,8 @@ describe("generateWhatsAppLink", () => {
 describe("triggerPrint", () => {
   it("opens the browser print dialog", () => {
     triggerPrint();
-    expect((window as unknown as { print: () => void }).print).toHaveBeenCalledTimes(1);
+    expect(
+      (window as unknown as { print: () => void }).print,
+    ).toHaveBeenCalledTimes(1);
   });
 });
