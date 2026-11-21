@@ -148,3 +148,4 @@ npm run build
 - **1:15 - 2:15 (My Plan & Low-Emission Routines)**: Switch to "My Plan". Show the personalized advice for children and asthma patients, interactive morning/commute/evening checklists, and the DIY Corsi-Rosenthal HEPA box hack. Highlight the plant myth explainer.
 - **2:15 - 2:50 (Ask AI Assistant & Offline Resilience)**: Open the chat drawer. Ask: *"When can I open my windows today?"* Show concise, grounded advice. Note that if offline or rate-limited, deterministic fallbacks ensure zero interruption.
 - **2:50 - 3:30 (Household Customization & Sharing)**: Open the Household Profile modal, modify family members and commute distance, save, and show the instant routine update. Demonstrate the one-click compressed share link and print-friendly export.
+
