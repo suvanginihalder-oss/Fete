@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import http from 'node:http';
+import { POPULAR_INDIAN_CITIES, findIndexedCity } from './src/lib/cityIndex.js';
 
 function devApiPlugin() {
+  const localCache = new Map<string, { data: any; exp: number }>();
+
   return {
     name: 'dev-api-middleware',
     configureServer(server: any) {
@@ -15,28 +18,54 @@ function devApiPlugin() {
         const pathname = urlObj.pathname;
 
         if (pathname === '/api/air-quality') {
-          const city = urlObj.searchParams.get('city') || 'Delhi';
+          const cityQuery = (urlObj.searchParams.get('city') || 'Delhi').trim();
+          const cacheKey = cityQuery.toLowerCase();
+
+          // Check in-memory fast cache
+          const hit = localCache.get(cacheKey);
+          if (hit && Date.now() < hit.exp) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            return res.end(JSON.stringify(hit.data));
+          }
+
           try {
-            // Geocode city via open-meteo
-            const geoRes = await new Promise<any>((resolve, reject) => {
-              http.get(`http://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`, (r) => {
-                let data = '';
-                r.on('data', c => data += c);
-                r.on('end', () => resolve(JSON.parse(data)));
-              }).on('error', reject);
-            });
+            let lat = 28.65;
+            let lon = 77.23;
+            let resolvedName = 'Delhi';
+            let tz = 'Asia/Kolkata';
 
-            if (!geoRes.results || geoRes.results.length === 0) {
-              res.statusCode = 404;
-              res.setHeader('Content-Type', 'application/json');
-              return res.end(JSON.stringify({ error: `City "${city}" not found` }));
+            // Fast indexed lookup
+            const found = findIndexedCity(cityQuery);
+            if (found) {
+              lat = found.latitude;
+              lon = found.longitude;
+              resolvedName = found.city;
+              tz = found.timezone;
+            } else {
+              const geoRes = await new Promise<any>((resolve, reject) => {
+                http.get(`http://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityQuery)}&count=1&language=en&format=json`, (r) => {
+                  let data = '';
+                  r.on('data', c => data += c);
+                  r.on('end', () => resolve(JSON.parse(data)));
+                }).on('error', reject);
+              });
+
+              if (!geoRes.results || geoRes.results.length === 0) {
+                res.statusCode = 404;
+                res.setHeader('Content-Type', 'application/json');
+                return res.end(JSON.stringify({ error: `City "${cityQuery}" not found` }));
+              }
+
+              lat = geoRes.results[0].latitude;
+              lon = geoRes.results[0].longitude;
+              resolvedName = geoRes.results[0].name;
+              tz = geoRes.results[0].timezone || 'Asia/Kolkata';
             }
-
-            const { latitude, longitude, name: resolvedName, timezone = 'auto' } = geoRes.results[0];
 
             // Fetch live air quality
             const aqRes = await new Promise<any>((resolve, reject) => {
-              http.get(`http://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&hourly=pm10,pm2_5&forecast_days=2&timezone=${encodeURIComponent(timezone)}`, (r) => {
+              http.get(`http://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&hourly=pm10,pm2_5&forecast_days=2&timezone=${encodeURIComponent(tz)}`, (r) => {
                 let data = '';
                 r.on('data', c => data += c);
                 r.on('end', () => resolve(JSON.parse(data)));
@@ -53,7 +82,6 @@ function devApiPlugin() {
               carbon_monoxide: Math.round(cur?.carbon_monoxide ?? 0)
             };
 
-            // Calculate Indian AQI
             const pm25Sub = Math.min(500, Math.round((curP.pm2_5 / 30) * 50));
             const pm10Sub = Math.min(500, Math.round((curP.pm10 / 50) * 50));
             const aqiVal = Math.max(pm25Sub, pm10Sub);
@@ -73,9 +101,9 @@ function devApiPlugin() {
 
             const payload = {
               city: resolvedName,
-              latitude,
-              longitude,
-              timezone,
+              latitude: lat,
+              longitude: lon,
+              timezone: tz,
               timestamp: cur?.time || new Date().toISOString(),
               current: curP,
               aqi: {
@@ -95,6 +123,9 @@ function devApiPlugin() {
               isModelledEstimate: true,
               gridResolutionKm: 11
             };
+
+            // Cache 15 minutes
+            localCache.set(cacheKey, { data: payload, exp: Date.now() + 15 * 60 * 1000 });
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
