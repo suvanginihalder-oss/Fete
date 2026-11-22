@@ -58,3 +58,4 @@ export function findIndexedCity(query: string): CityCoordinates | undefined {
     (c) => c.city.toLowerCase() === q || c.state.toLowerCase() === q
   );
 }
+

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import {
   Wind,
   Search,
@@ -26,9 +26,11 @@ import { AlertBanner } from './components/AlertBanner.js';
 import { AQIGauge } from './components/AQIGauge.js';
 import { PollutantCards } from './components/PollutantCards.js';
 import { ForecastChart } from './components/ForecastChart.js';
-import { MyPlanView } from './components/MyPlanView.js';
-import { ChatDrawer } from './components/ChatDrawer.js';
-import { ProfileFormModal } from './components/ProfileFormModal.js';
+
+// Lazy load non-critical drawer and modal components for faster initial load
+const MyPlanView = lazy(() => import('./components/MyPlanView.js').then(m => ({ default: m.MyPlanView })));
+const ChatDrawer = lazy(() => import('./components/ChatDrawer.js').then(m => ({ default: m.ChatDrawer })));
+const ProfileFormModal = lazy(() => import('./components/ProfileFormModal.js').then(m => ({ default: m.ProfileFormModal })));
 
 export function App() {
   const [profile, setProfile] = useState<HouseholdProfile>(() => {
@@ -54,10 +56,10 @@ export function App() {
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
 
-  // Client-side instant memory cache for cities
+  // Client-side persistent session cache
   const cityCache = useMemo(() => new Map<string, AirQualityData>(), []);
 
-  // Fetch real air quality data (sub-100ms on indexed hits)
+  // Fetch real air quality data (sub-50ms on cache hit)
   const fetchAirQuality = useCallback(
     async (targetCity: string) => {
       const key = targetCity.trim().toLowerCase();
@@ -120,7 +122,7 @@ export function App() {
     [cityCache]
   );
 
-  // Fetch or regenerate personalized AI plan
+  // Lazy plan fetch: only called when needed or on tab change
   const fetchPlan = useCallback(
     async (curProfile: HouseholdProfile, curAq: AirQualityData) => {
       setLoadingPlan(true);
@@ -156,17 +158,25 @@ export function App() {
     []
   );
 
+  // Initial load: Fetch AQ first for immediate dashboard display
   useEffect(() => {
     let isMounted = true;
     fetchAirQuality(profile.city).then((data) => {
-      if (isMounted && data) {
+      if (isMounted && data && activeTab === 'plan') {
         fetchPlan(profile, data);
       }
     });
     return () => {
       isMounted = false;
     };
-  }, [profile.city, fetchAirQuality, fetchPlan, profile]);
+  }, [profile.city, fetchAirQuality, fetchPlan, profile, activeTab]);
+
+  // When switching to the plan tab, generate if not already loaded
+  useEffect(() => {
+    if (activeTab === 'plan' && !plan && aqData) {
+      fetchPlan(profile, aqData);
+    }
+  }, [activeTab, plan, aqData, fetchPlan, profile]);
 
   const handleCitySelect = (cityName: string) => {
     const clean = cityName.trim();
@@ -175,6 +185,7 @@ export function App() {
     const updated = { ...profile, city: clean };
     setProfile(updated);
     saveHouseholdProfile(updated);
+    setPlan(null); // Reset plan so it regenerates on demand
   };
 
   const handleSaveProfile = (updated: HouseholdProfile) => {
@@ -185,11 +196,16 @@ export function App() {
     }
   };
 
-  const timeWindows = analyzeTimeWindows(aqData?.hourly || []);
-  const baselineAdvice = generateBaselineAdvice(aqData?.aqi.band || 'Poor', profile);
+  const timeWindows = useMemo(() => analyzeTimeWindows(aqData?.hourly || []), [aqData?.hourly]);
+  const baselineAdvice = useMemo(
+    () => generateBaselineAdvice(aqData?.aqi.band || 'Poor', profile),
+    [aqData?.aqi.band, profile]
+  );
 
-  // Grouped States / Regions filter
-  const regions = ['All', 'Delhi NCR', 'Uttar Pradesh', 'Maharashtra', 'Karnataka', 'West Bengal', 'Punjab / Haryana', 'Gujarat', 'South India'];
+  const regions = useMemo(
+    () => ['All', 'Delhi NCR', 'Uttar Pradesh', 'Maharashtra', 'Karnataka', 'West Bengal', 'Punjab / Haryana', 'Gujarat', 'South India'],
+    []
+  );
 
   const filteredCities = useMemo(() => {
     if (selectedRegion === 'All') return POPULAR_INDIAN_CITIES;
@@ -236,7 +252,7 @@ export function App() {
             </div>
           </div>
 
-          {/* Quick Search & Select Dropdown */}
+          {/* Quick Search */}
           <div className="flex-1 max-w-sm hidden md:flex items-center gap-2">
             <div className="relative w-full">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" aria-hidden="true" />
@@ -470,12 +486,14 @@ export function App() {
           hidden={activeTab !== 'plan'}
         >
           {plan ? (
-            <MyPlanView
-              plan={plan}
-              profile={profile}
-              onRegenerate={() => aqData && fetchPlan(profile, aqData)}
-              isLoading={loadingPlan}
-            />
+            <Suspense fallback={<div className="p-12 text-center text-slate-500">Loading plan view...</div>}>
+              <MyPlanView
+                plan={plan}
+                profile={profile}
+                onRegenerate={() => aqData && fetchPlan(profile, aqData)}
+                isLoading={loadingPlan}
+              />
+            </Suspense>
           ) : (
             <div className="p-12 text-center text-slate-500">
               <RefreshCw className="w-8 h-8 animate-spin mx-auto text-emerald-600 mb-2" />
@@ -517,22 +535,30 @@ export function App() {
         </div>
       </footer>
 
-      {/* Modals and Drawers */}
-      <ChatDrawer
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        city={aqData?.city || profile.city}
-        aqi={aqData?.aqi.aqi || 250}
-        band={aqData?.aqi.band || 'Poor'}
-        members={profile.members}
-      />
+      {/* Modals and Drawers (Suspense loaded on demand) */}
+      <Suspense fallback={null}>
+        {isChatOpen && (
+          <ChatDrawer
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            city={aqData?.city || profile.city}
+            aqi={aqData?.aqi.aqi || 250}
+            band={aqData?.aqi.band || 'Poor'}
+            members={profile.members}
+          />
+        )}
+      </Suspense>
 
-      <ProfileFormModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        profile={profile}
-        onSave={handleSaveProfile}
-      />
+      <Suspense fallback={null}>
+        {isProfileModalOpen && (
+          <ProfileFormModal
+            isOpen={isProfileModalOpen}
+            onClose={() => setIsProfileModalOpen(false)}
+            profile={profile}
+            onSave={handleSaveProfile}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

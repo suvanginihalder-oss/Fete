@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import http from 'node:http';
-import { POPULAR_INDIAN_CITIES, findIndexedCity } from './src/lib/cityIndex.js';
+import { findIndexedCity } from './src/lib/cityIndex.js';
 
 function devApiPlugin() {
   const localCache = new Map<string, { data: any; exp: number }>();
@@ -145,6 +145,18 @@ function devApiPlugin() {
 
 export default defineConfig({
   plugins: [react(), devApiPlugin()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          charts: ['recharts'],
+          icons: ['lucide-react']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 600
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
